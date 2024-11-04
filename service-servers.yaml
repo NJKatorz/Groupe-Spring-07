@@ -1,0 +1,97 @@
+openapi: 3.0.3
+info:
+  title: Vinci Cyber Intelligence Server service
+  description: Micro service de gestion des serveurs pour le projet Vinci Cyber Intelligence. Permet de créer de nouveaux serveurs, consulter leurs détails, les modifier, et les supprimer.
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+    description:  Development server
+paths:
+
+  /servers/{ip}:
+    parameters:
+      - name: ip
+        in: path
+        required: true
+        description: IP address of the server
+        schema:
+          type: string
+
+  post:
+    summary: Créer un nouveau serveur
+    requestBody:
+      description: Données du server à créer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/server'
+
+    responses:
+        '201':
+            description: Serveur créé
+        '400':
+            description: Données invalides
+        '409':
+            description: Serveur déjà existant
+
+
+    get:
+      summary: Récupérer les détails d'un serveur
+      responses:
+        '200':
+          description: Détails du serveur
+        '404':
+          description: Aucun serveur trouvé pour cette adresse IP
+
+    put:
+        summary: Mis à jour d'un serveur
+        requestBody:
+            description: Données du server à mettre à jour
+            content:
+            application/json:
+                schema:
+                $ref: '#/components/schemas/server'
+        responses:
+            '200':
+              description: Serveur mis à jour
+            '400':
+              description: Données invalides
+            '404':
+              description: Aucun serveur trouvé pour cette adresse IP
+
+    delete:
+        summary: Supprimer un serveur
+        responses:
+            '200':
+              description: Serveur supprimé
+            '404':
+              description: Aucun serveur trouvé pour cette adresse IP
+
+components:
+  schemas:
+    server:
+      type: object
+      properties:
+        ip:
+          type: string
+          description: L'adresse IP du serveur
+        entreprise:
+          type: string
+          description: L'entreprise hebergeant le serveur
+        type:
+          type: string
+          description: Le type de serveur
+        technology:
+          type: string
+          description: La technologie utilisée
+        valid:
+          type: boolean
+          description: Le serveur est-il valide ?
+
+      example:
+        ip: '246.250.160.253'
+        entreprise: 'Vinci'
+        type: 'web'
+        technology: 'apache'
+        valid: true
+
