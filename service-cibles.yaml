@@ -1,9 +1,33 @@
 openapi: 3.0.3
 info:
   title: Vinci Cyber Intelligence Cible service
-  description: Micro service de gestion des cibles ...
+  description: Micro service de gestion des cibles pour le projet. Permet de ...
   version: 1.0.0
 servers:
   - url: 'http://localhost:8080'
+    description: Development server
 paths:
-  
+
+  /cibles:
+
+    get:
+      summary: Lire toutes les cibles
+      responses:
+        200:
+          description: Retourne la liste de toutes les cibles
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/cible'
+
+
+
+    delete:
+      summary: Supprimer toutes les cibles ...
+      responses:
+        404:
+          description: Aucune cible trouvée avec cet identifiant
+        200:
+          description: La cible a été supprimée, ...
