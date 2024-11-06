@@ -1,7 +1,15 @@
 openapi: 3.0.3
 info:
   title: Vinci Cyber Intelligence Cible service
-  description: Micro service de gestion des cibles pour le projet. Permet de ...
+  description: |
+    Microservice de gestion des cibles. Ce service permet aux hackers d'enregistrer des cibles potentielles pour leurs attaques. 
+    Chaque cible doit être décrite avec précision, incluant le nom de l’entreprise, son nom de domaine, sa localisation, son nombre d’employés, 
+    son nombre de serveurs, et son chiffre d’affaires. Un utilisateur administrateur doit pouvoir créer une nouvelle cible, initialement avec un 
+    nombre de serveurs à zéro. Il peut ensuite modifier son nom de domaine, son nombre d’employés ou son chiffre d’affaires. 
+    Il peut également supprimer une cible. Tous les utilisateurs peuvent consulter les informations des cibles. 
+    Ils doivent également pouvoir rechercher des cibles en fonction du nombre de serveurs ou d’un chiffre d’affaires minimal. 
+    Par ailleurs, il est possible de trouver les cibles qui sont co-localisées. En effet, si un hacker a déjà compromis les serveurs de l’entreprise A, 
+    et qu’on sait que ses services tournent sur la même machine (hébergement mutualisé) que ceux de la société B, il pourrait vouloir lancer une attaque sur la société B.
   version: 1.0.0
 servers:
   - url: 'http://localhost:8080'
@@ -9,7 +17,6 @@ servers:
 paths:
 
   /cibles:
-
     get:
       summary: Lire toutes les cibles
       responses:
@@ -20,14 +27,144 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#components/schemas/cible'
+                  $ref: '#/components/schemas/cible'
 
+    post:
+      summary: Créer une nouvelle cible
+      requestBody:
+        description: Données de la cible à créer
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/cible'
+      responses:
+        201:
+          description: La cible a été créée
 
+  /cibles/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: ID de la cible
+        required: true
+        schema:
+          type: integer
+          example: 1
 
-    delete:
-      summary: Supprimer toutes les cibles ...
+    get:
+      summary: Lire les détails d'une cible
       responses:
         404:
-          description: Aucune cible trouvée avec cet identifiant
+          description: Aucune cible n'a été trouvée pour cet ID
         200:
-          description: La cible a été supprimée, ...
+          description: Retourne les détails de la cible
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/cible'
+
+    delete:
+      summary: Supprimer une cible
+      responses:
+        404:
+          description: Aucune cible n'a été trouvée pour cet ID
+        200:
+          description: La cible a été supprimée
+
+    patch:
+      summary: Modifier une cible
+      requestBody:
+        description: Données de la cible à modifier
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/cible'
+      responses:
+        404:
+          description: Aucune cible n'a été trouvée pour cet ID
+        200:
+          description: La cible a été modifiée
+
+  /cibles/search:
+    get:
+      summary: Rechercher des cibles
+      parameters:
+        - name: nbServers
+          in: query
+          description: Nombre minimal de serveurs
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - name: revenue
+          in: query
+          description: Chiffre d'affaires minimal
+          required: false
+          schema:
+            type: integer
+            example: 100000
+      responses:
+        200:
+          description: Retourne la liste des cibles correspondant aux critères de recherche
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/cible'
+
+  /cibles/colocated:
+    get:
+      summary: Trouver des cibles co-localisées
+      parameters:
+        - name: companyName
+          in: query
+          description: Nom de l'entreprise déjà compromise
+          required: true
+          schema:
+            type: string
+            example: Entreprise A
+      responses:
+        200:
+          description: Retourne la liste des cibles co-localisées
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/cible'
+
+components:
+  schemas:
+    cible:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique de la cible
+        companyName:
+          type: string
+          description: Nom de l'entreprise
+        domain:
+          type: string
+          description: Nom de domaine de la cible
+        localisation:
+          type: string
+          description: Localisation de la cible
+        nbEmploys:
+          type: integer
+          description: Nombre d'employés de la cible
+        nbServers:
+          type: integer
+          description: Nombre de serveurs de la cible
+        revenue:
+          type: integer
+          description: Chiffre d'affaires de la cible
+      example:
+        id: 1
+        companyName: My Company
+        domain: mycompany.com
+        localisation: Bruxelles
+        nbEmploys: 100
+        nbServers: 15
+        revenue: 210000
