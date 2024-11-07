@@ -1,7 +1,11 @@
 openapi: 3.0.3
 info:
   title: Vinci Cyber Intelligence Users Service
-  description: Microservice de gestion des utilisateurs pour le projet Vinci Cyber Intelligence. Permet de créer, lire, modifier et supprimer des utilisateurs.
+  description: |
+    Microservice de gestion des utilisateurs pour le projet Vinci Cyber Intelligence. 
+    Ce service permet aux administrateurs et utilisateurs de créer, lire, modifier et supprimer des 
+    utilisateurs dans le système. Il inclut la gestion des informations utilisateur telles que le 
+    nom d'utilisateur, le prénom, le nom de famille, et le statut d'administrateur.
   version: 1.0.0
 servers:
   - url: http://localhost:9005
@@ -9,34 +13,37 @@ servers:
 
 paths:
 
+  /users:
+    get:
+      summary: Récupérer la liste de tous les utilisateurs
+      description: |
+        Cette route permet de récupérer la liste de tous les utilisateurs enregistrés dans le système. 
+        Les détails incluent leur nom d'utilisateur, prénom, nom, et statut d'administrateur.
+      responses:
+        200:
+          description: Retourne la liste de tous les utilisateurs
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
   /users/{username}:
     parameters:
       - name: username
         in: path
+        description: Nom d'utilisateur unique
+        required: true
         schema:
           type: string
-        example: hacker01
-        description: Nom d'utilisateur
-
-    post:
-      summary: Créer un utilisateur
-      requestBody:
-        description: Données de l'utilisateur à créer
-        required: true
-        content:
-          'application/json':
-            schema:
-              $ref: '#/components/schemas/UserWithRole'
-      responses:
-        400:
-          description: Le nom d'utilisateur en paramètre ne correspond pas aux données fournies, ou les données ne sont pas valides
-        409:
-          description: Un utilisateur existe déjà avec ce nom d'utilisateur
-        201:
-          description: L'utilisateur a été créé avec succès
+          example: hacker01
 
     get:
-      summary: Récupérer les informations d'un utilisateur par son nom
+      summary: Récupérer les informations d'un utilisateur spécifique
+      description: |
+        Permet de récupérer les informations complètes d'un utilisateur spécifique grâce à son 
+        nom d'utilisateur. Si l'utilisateur n'est pas trouvé, un code d'erreur 404 est retourné.
       responses:
         404:
           description: Aucun utilisateur trouvé avec ce nom d'utilisateur
@@ -47,18 +54,43 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
 
+    post:
+      summary: Créer un nouvel utilisateur
+      description: |
+        Crée un utilisateur dans le système en fournissant les informations nécessaires telles que 
+        le nom d'utilisateur, le prénom, le nom et le statut d'administrateur. Un code 201 indique 
+        que la création a été réussie, tandis qu'un code 409 est retourné en cas de conflit.
+      requestBody:
+        description: Données de l'utilisateur à créer
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/UserWithAdminStatus'
+      responses:
+        400:
+          description: Les données fournies sont invalides
+        409:
+          description: Un utilisateur existe déjà avec ce nom d'utilisateur
+        201:
+          description: L'utilisateur a été créé avec succès
+
     put:
       summary: Modifier les informations d'un utilisateur
+      description: |
+        Met à jour les informations d'un utilisateur existant, y compris son prénom, son nom de 
+        famille et son statut d'administrateur. Si l'utilisateur n'est pas trouvé, un code 404 
+        est retourné.
       requestBody:
         description: Nouvelles données de l'utilisateur
         required: true
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/UserWithRole'
+              $ref: '#/components/schemas/UserWithAdminStatus'
       responses:
         400:
-          description: Le nom d'utilisateur en paramètre ne correspond pas aux données fournies, ou les données ne sont pas valides
+          description: Les données fournies sont invalides
         404:
           description: Aucun utilisateur trouvé avec ce nom d'utilisateur
         200:
@@ -66,6 +98,10 @@ paths:
 
     delete:
       summary: Supprimer un utilisateur
+      description: |
+        Permet de supprimer un utilisateur existant du système en utilisant son nom d'utilisateur.
+        Retourne un code 404 si l'utilisateur n'est pas trouvé et un code 200 si la suppression 
+        a été effectuée avec succès.
       responses:
         404:
           description: Aucun utilisateur trouvé avec ce nom d'utilisateur
@@ -79,39 +115,39 @@ components:
       properties:
         username:
           type: string
-          description: Nom d'utilisateur
+          description: Nom d'utilisateur unique
         firstname:
           type: string
           description: Prénom de l'utilisateur
         lastname:
           type: string
-          description: Nom de l'utilisateur
-        role:
-          type: string
-          description: Rôle de l'utilisateur (ex. "hacker", "admin")
+          description: Nom de famille de l'utilisateur
+        isAdmin:
+          type: boolean
+          description: Indique si l'utilisateur est un administrateur (true) ou un utilisateur standard (false)
       example:
         username: hacker01
         firstname: John
         lastname: Doe
-        role: hacker
+        isAdmin: false
 
-    UserWithRole:
+    UserWithAdminStatus:
       type: object
       properties:
         username:
           type: string
-          description: Nom d'utilisateur
+          description: Nom d'utilisateur unique
         firstname:
           type: string
           description: Prénom de l'utilisateur
         lastname:
           type: string
-          description: Nom de l'utilisateur
-        role:
-          type: string
-          description: Rôle de l'utilisateur (ex. "hacker", "admin")
+          description: Nom de famille de l'utilisateur
+        isAdmin:
+          type: boolean
+          description: Indique si l'utilisateur est un administrateur
       example:
         username: hacker01
         firstname: John
         lastname: Doe
-        role: hacker
+        isAdmin: false
