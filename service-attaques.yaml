@@ -152,8 +152,8 @@ components:
       required:
         - cible
       example:
-        cible: '1'
+        cible: 1
         serveur: '198.202.505'
-        exploit: '1'
+        exploit: 1
         statut: 'prévue'
         notes: 'Première attaque'

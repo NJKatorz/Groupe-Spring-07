@@ -1,0 +1,338 @@
+openapi: 3.0.3
+info:
+  title: Vinci Cyber Intelligence Gateway
+  description: Point d’entrée unique pour l'ensemble des services du projet Vinci Cyber Intelligence. Permet de centraliser les requêtes aux différents microservices comme l'authentification, la gestion des utilisateurs, des exploits, des cibles, et des serveurs.
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+    description: Development server
+paths:
+  /auth:
+    post:
+      summary: Authentification d'un utilisateur
+      description: |
+        Permet à un utilisateur de s'authentifier en fournissant ses identifiants. En cas de succès, un token JWT est renvoyé pour authentifier les requêtes ultérieures.
+
+        **Corps de la requête** :
+          - `username` (obligatoire) : Le pseudo de l'utilisateur.
+          - `password` (obligatoire) : Le mot de passe de l'utilisateur.
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les identifiants fournis sont incorrects.
+          - `401 Unauthorized` : Si l'authentification échoue.
+
+      requestBody:
+        description: Identifiants de l'utilisateur pour générer un token JWT
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/credentials'
+      responses:
+        '200':
+          description: Retourne un token d'authentification pour l'utilisateur
+        '400':
+          description: Erreur d'identifiants invalides
+        '401':
+          description: Erreur d'authentification
+
+  /users/{pseudo}:
+    parameters:
+      - name: pseudo
+        in: path
+        description: Pseudo de l'utilisateur
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Récupérer les informations d'un utilisateur
+      description: |
+        Permet de récupérer les informations détaillées d'un utilisateur en fonction de son pseudo.
+
+        **Paramètres** :
+          - `user` (obligatoire) : Le pseudo de l'utilisateur.
+
+        **Erreurs possibles** :
+          - `404 Not Found` : Si l'utilisateur avec ce pseudo n'existe pas.
+
+      responses:
+        '200':
+          description: Les informations de l'utilisateur récupérées avec succès
+        '404':
+          description: L'utilisateur n'a pas été trouvé
+
+  /exploits:
+    get:
+      summary: Consulter tous les exploits
+      description: |
+        Permet de récupérer la liste de tous les exploits disponibles dans le système.
+
+        **Erreurs possibles** :
+          - `404 Not Found` : Si aucun exploit n'est trouvé.
+
+      responses:
+        '200':
+          description: Liste des exploits récupérée avec succès
+        '404':
+          description: Aucun exploit trouvé
+
+    post:
+      summary: Créer un nouvel exploit
+      description: |
+        Permet de créer un nouvel exploit en fournissant les informations nécessaires. Seuls les champs obligatoires sont nécessaires pour la création.
+
+        **Corps de la requête** :
+          - `name` (obligatoire) : Nom de l'exploit.
+          - `description` (obligatoire) : Description de l'exploit.
+          - `author` (optionnel) : Auteur de l'exploit.
+          - `server_type` (optionnel) : Type de serveur affecté.
+          - `guide` (optionnel) : Guide étape par étape pour l'exploitation.
+          - `validated` (optionnel) : Indicateur de validation de l'exploit.
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les données fournies ne sont pas valides.
+
+      requestBody:
+        description: Données de l'exploit à créer
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/exploit'
+      responses:
+        '201':
+          description: Exploit créé avec succès
+        '400':
+          description: Données invalides
+
+  /cibles:
+    get:
+      summary: Consulter toutes les cibles
+      description: |
+        Permet de récupérer la liste des cibles existantes dans le système, incluant les entreprises, domaines, et autres caractéristiques.
+
+        **Erreurs possibles** :
+          - `404 Not Found` : Si aucune cible n'est trouvée.
+
+      responses:
+        '200':
+          description: Liste des cibles récupérée avec succès
+        '404':
+          description: Aucune cible trouvée
+
+    post:
+      summary: Créer une nouvelle cible
+      description: |
+        Permet de créer une nouvelle cible avec les informations spécifiées. La création nécessite au moins le nom de l'entreprise et son domaine.
+
+        **Corps de la requête** :
+          - `companyName` (obligatoire) : Nom de l'entreprise cible.
+          - `domain` (obligatoire) : Domaine de l'entreprise cible.
+          - `localisation` (optionnel) : Localisation géographique de la cible.
+          - `nbEmploys` (optionnel) : Nombre d'employés de l'entreprise.
+          - `nbServers` (optionnel) : Nombre de serveurs associés à la cible.
+          - `revenue` (optionnel) : Chiffre d'affaires de l'entreprise.
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les données fournies ne sont pas valides.
+
+      requestBody:
+        description: Données de la cible à créer
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cible'
+      responses:
+        '201':
+          description: Cible créée avec succès
+        '400':
+          description: Données invalides
+
+  /serveurs:
+    get:
+      summary: Consulter tous les serveurs
+      description: |
+        Permet de récupérer la liste des serveurs associés aux différentes cibles dans le système.
+
+        **Erreurs possibles** :
+          - `404 Not Found` : Si aucun serveur n'est trouvé.
+
+      responses:
+        '200':
+          description: Liste des serveurs récupérée avec succès
+        '404':
+          description: Aucun serveur trouvé
+
+    post:
+      summary: Ajouter un nouveau serveur
+      description: |
+        Permet d'ajouter un serveur à une cible existante. Un serveur doit avoir une adresse IP, un type, et un hébergeur.
+
+        **Corps de la requête** :
+          - `ip` (obligatoire) : Adresse IP du serveur.
+          - `entreprise` (obligatoire) : Nom de l'entreprise hébergeant le serveur.
+          - `type` (obligatoire) : Type du serveur (ex. Web, FTP, etc.).
+          - `technology` (optionnel) : Technologie utilisée par le serveur.
+          - `valid` (optionnel) : Statut de validation du serveur.
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les données fournies ne sont pas valides.
+
+      requestBody:
+        description: Données du serveur à ajouter
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/server'
+      responses:
+        '201':
+          description: Serveur ajouté avec succès
+        '400':
+          description: Données invalides
+
+  /attaques:
+    post:
+      summary: Créer une nouvelle attaque
+      description: |
+        Permet de créer une nouvelle attaque en associant une cible, un serveur, et un exploit. Le statut de l'attaque est également spécifié. Par défaut, l'attaque est marquée comme `prévue`.
+
+        **Corps de la requête** :
+          - `cible` (obligatoire) : Cible de l'attaque.
+          - `serveur` (optionnel) : Serveur affecté à l'attaque.
+          - `exploit` (optionnel) : Exploit utilisé pour l'attaque.
+          - `statut` (optionnel) : Statut de l'attaque (prévu, en cours, réussi, raté).
+          - `notes` (optionnel) : Notes liées à l'attaque.
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Données invalides.
+          - `409 Conflict` : Attaque déjà existante avec ces mêmes paramètres.
+
+      requestBody:
+        description: Données de l'attaque à créer
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/attaque'
+      responses:
+        '201':
+          description: Attaque créée avec succès
+        '400':
+          description: Données invalides
+        '409':
+          description: Attaque déjà existante
+
+components:
+  schemas:
+    credentials:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+      example:
+        username: "Hacker007"
+        password: "password123"
+
+    exploit:
+      type: object
+      properties:
+        exploit_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        author:
+          type: string
+        server_type:
+          type: string
+        guide:
+          type: string
+        validated:
+          type: boolean
+      required:
+        - name
+        - description
+      example:
+        name: "Exploit SQL Injection"
+        description: "Exploitation d'une vulnérabilité SQL"
+        author: "John Doe"
+        server_type: "Web"
+        validated: true
+
+    cible:
+      type: object
+      properties:
+        companyName:
+          type: string
+        domain:
+          type: string
+        localisation:
+          type: string
+        nbEmploys:
+          type: integer
+        revenue:
+          type: number
+      required:
+        - companyName
+        - domain
+      example:
+        companyName: "Cible1"
+        domain: "Finance"
+        localisation: "Paris"
+        nbEmploys: 1000
+        nbServers: 50
+        revenue: 50000000
+
+    server:
+      type: object
+      properties:
+        ip:
+          type: string
+        entreprise:
+          type: string
+        type:
+          type: string
+        technology:
+          type: string
+        valid:
+          type: boolean
+      required:
+        - adresse_ip
+        - entreprise_hebergeante
+        - type_serveur
+      example:
+        ip: "192.168.1.1"
+        entreprise: "HostingCo"
+        type: "Web"
+        technology: "Apache"
+        valid: true
+
+    attaque:
+      type: object
+      properties:
+        cible:
+          type: integer
+        serveur:
+          type: string
+        exploit:
+          type: integer
+        statut:
+          type: string
+          enum:
+            - prévue
+            - en cours
+            - réussie
+            - ratée
+        notes:
+          type: string
+      required:
+        - cible
+      example:
+        cible: 1
+        serveur: "198.202.505"
+        exploit: 1
+        statut: "prévue"
+        notes: "Première attaque"
