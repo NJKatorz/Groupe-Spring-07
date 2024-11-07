@@ -1,0 +1,159 @@
+openapi: 3.0.3
+info:
+  title: Vinci Cyber Intelligence Attack service
+  description: Micro service de gestion des attaques pour le projet Vinci Cyber Intelligence. Permet de créer de nouvelles attaques en renseignant la cible au départ, de préciser un serveur et un exploit pour une attaque, d'indiquer le résultat et modifier les notes d'une attaque.
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:9004'
+    description: Development server
+paths:
+  /attaques:
+    post:
+      summary: Créer une nouvelle attaque
+      description: |
+        Permet de créer une nouvelle attaque en fournissant une cible, un serveur, un exploit, un statut, et des notes. 
+        Seule la cible est obligatoire au départ.
+
+        **Paramètres** : Aucun paramètre dans l'URL. Les données de l'attaque sont envoyées dans le corps de la requête.
+
+        **Préconditions** :
+          - La cible doit être spécifiée pour créer une attaque.
+          - Si un serveur et un exploit sont précisés, ils doivent être validés.
+          - Les valeurs possibles pour le champ `statut` sont : `prévue`, `en cours`, `réussie`, ou `ratée`.
+
+        **Corps de la requête** :
+          - `cible` (obligatoire) : La cible de l'attaque.
+          - `serveur` (optionnel) : Le serveur associé à l'attaque, si disponible.
+          - `exploit` (optionnel) : L'exploit utilisé dans l'attaque, si disponible.
+          - `statut` (optionnel) : Le statut de l'attaque. Par défaut `prévue` si non spécifié.
+          - `notes` (optionnel) : Des notes sur l'attaque.
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les données fournies ne sont pas valides.
+          - `409 Conflict` : Si une attaque avec les mêmes paramètres existe déjà.
+      requestBody:
+        description: Données de l'attaque à créer.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/attaque'
+      responses:
+        '201':
+          description: Attaque créée avec succès
+        '400':
+          description: Données invalides fournies
+        '409':
+          description: Attaque avec ces paramètres déjà existante
+
+  /attaques/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID de l'attaque (obligatoire)
+    get:
+      summary: Récupérer les détails d'une attaque
+      description: |
+        Permet de récupérer les détails d'une attaque spécifique en utilisant son identifiant unique.
+
+        **Paramètres** :
+          - `id` (obligatoire) : L'identifiant de l'attaque que l'on souhaite récupérer.
+
+        **Préconditions** :
+          - L'identifiant `id` doit correspondre à une attaque existante dans le système.
+
+        **Erreurs possibles** :
+          - `404 Not Found` : Si aucune attaque avec cet identifiant n'est trouvée.
+      responses:
+        '200':
+          description: Détails de l'attaque récupérés avec succès
+        '404':
+          description: Aucune attaque trouvée pour cet ID
+
+    patch:
+      summary: Mettre à jour une attaque
+      description: |
+        Permet de mettre à jour une attaque existante, en modifiant le serveur, l'exploit, le statut ou les notes. Les champs qui ne sont pas spécifiés dans la requête ne sont pas modifiés.
+
+        **Paramètres** :
+          - `id` (obligatoire) : L'identifiant de l'attaque à mettre à jour.
+
+        **Préconditions** :
+          - L'identifiant `id` doit correspondre à une attaque existante.
+          - Les champs modifiés (serveur, exploit, statut) doivent être valides et respecter les contraintes d'intégrité.
+
+        **Corps de la requête** (attributs optionnels à mettre à jour) :
+          - `serveur` (optionnel) : Le nouveau serveur pour l'attaque.
+          - `exploit` (optionnel) : Le nouvel exploit à associer à l'attaque.
+          - `statut` (optionnel) : Le statut de l'attaque. Valeurs autorisées : `prévue`, `en cours`, `réussie`, `ratée`.
+          - `notes` (optionnel) : Notes supplémentaires ou mises à jour.
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les données fournies pour la mise à jour ne sont pas valides.
+          - `404 Not Found` : Si aucune attaque avec cet identifiant n'est trouvée.
+      requestBody:
+        description: Données de l'attaque à mettre à jour.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/attaque'
+      responses:
+        '200':
+          description: Attaque mise à jour avec succès
+        '400':
+          description: Données invalides fournies pour la mise à jour
+        '404':
+          description: Aucune attaque trouvée pour cet ID
+
+    delete:
+      summary: Supprimer une attaque
+      description: |
+        Supprime une attaque existante identifiée par son `id`.
+
+        **Paramètres** :
+          - `id` (obligatoire) : L'identifiant de l'attaque à supprimer.
+
+        **Préconditions** :
+          - L'identifiant `id` doit correspondre à une attaque existante.
+
+        **Erreurs possibles** :
+          - `404 Not Found` : Si aucune attaque avec cet identifiant n'est trouvée.
+      responses:
+        '200':
+          description: Attaque supprimée avec succès
+        '404':
+          description: Aucune attaque trouvée pour cet ID
+
+components:
+  schemas:
+    attaque:
+      type: object
+      properties:
+        cible:
+          type: integer
+          description: La cible de l'attaque
+        serveur:
+          type: string
+          description: Le serveur utilisé pour l'attaque
+        exploit:
+          type: integer
+          description: L'exploit utilisé pour l'attaque
+        statut:
+          type: string
+          description: Le statut de l'attaque (prévue, en cours, réussie, ratée)
+          enum:
+            - prévue
+            - en cours
+            - réussie
+            - ratée
+        notes:
+          type: string
+          description: Notes sur l'attaque
+      required:
+        - cible
+      example:
+        cible: 1
+        serveur: '198.202.505'
+        exploit: 1
+        statut: 'prévue'
+        notes: 'Première attaque'

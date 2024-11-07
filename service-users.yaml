@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+  title: Vinci Cyber Intelligence Users Service
+  description: Microservice de gestion des utilisateurs pour le projet Vinci Cyber Intelligence. Permet de créer, lire, modifier et supprimer des utilisateurs.
+  version: 1.0.0
+servers:
+  - url: http://localhost:9005
+    description: Development server
+
+paths:
+
+  /users/{username}:
+    parameters:
+      - name: username
+        in: path
+        schema:
+          type: string
+        example: hacker01
+        description: Nom d'utilisateur
+
+    post:
+      summary: Créer un utilisateur
+      requestBody:
+        description: Données de l'utilisateur à créer
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/UserWithRole'
+      responses:
+        400:
+          description: Le nom d'utilisateur en paramètre ne correspond pas aux données fournies, ou les données ne sont pas valides
+        409:
+          description: Un utilisateur existe déjà avec ce nom d'utilisateur
+        201:
+          description: L'utilisateur a été créé avec succès
+
+    get:
+      summary: Récupérer les informations d'un utilisateur par son nom
+      responses:
+        404:
+          description: Aucun utilisateur trouvé avec ce nom d'utilisateur
+        200:
+          description: Retourne les données de l'utilisateur correspondant
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/User'
+
+    put:
+      summary: Modifier les informations d'un utilisateur
+      requestBody:
+        description: Nouvelles données de l'utilisateur
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/UserWithRole'
+      responses:
+        400:
+          description: Le nom d'utilisateur en paramètre ne correspond pas aux données fournies, ou les données ne sont pas valides
+        404:
+          description: Aucun utilisateur trouvé avec ce nom d'utilisateur
+        200:
+          description: L'utilisateur a été modifié avec succès
+
+    delete:
+      summary: Supprimer un utilisateur
+      responses:
+        404:
+          description: Aucun utilisateur trouvé avec ce nom d'utilisateur
+        200:
+          description: L'utilisateur a été supprimé avec succès
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Nom d'utilisateur
+        firstname:
+          type: string
+          description: Prénom de l'utilisateur
+        lastname:
+          type: string
+          description: Nom de l'utilisateur
+        role:
+          type: string
+          description: Rôle de l'utilisateur (ex. "hacker", "admin")
+      example:
+        username: hacker01
+        firstname: John
+        lastname: Doe
+        role: hacker
+
+    UserWithRole:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Nom d'utilisateur
+        firstname:
+          type: string
+          description: Prénom de l'utilisateur
+        lastname:
+          type: string
+          description: Nom de l'utilisateur
+        role:
+          type: string
+          description: Rôle de l'utilisateur (ex. "hacker", "admin")
+      example:
+        username: hacker01
+        firstname: John
+        lastname: Doe
+        role: hacker
