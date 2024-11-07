@@ -146,7 +146,7 @@ paths:
         '400':
           description: Données invalides
 
-  /serveurs:
+  /servers:
     get:
       summary: Consulter tous les serveurs
       description: |
@@ -274,7 +274,7 @@ components:
         nbEmploys:
           type: integer
         revenue:
-          type: number
+          type: integer
       required:
         - companyName
         - domain
