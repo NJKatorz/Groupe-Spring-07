@@ -158,7 +158,7 @@ components:
         ip:
           type: string
           description: L'adresse IP du serveur
-        entreprise:
+        company:
           type: string
           description: L'entreprise hébergeant le serveur
         type:
@@ -167,12 +167,12 @@ components:
         technology:
           type: string
           description: La technologie utilisée
-        valid:
+        validated:
           type: boolean
           description: Le serveur est-il validé ?
       example:
         ip: '246.250.160.253'
-        entreprise: 'Vinci'
+        company: 'Vinci'
         type: 'web'
         technology: 'apache'
-        valid: true
+        validated: true

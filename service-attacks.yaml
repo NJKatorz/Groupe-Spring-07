@@ -1,0 +1,211 @@
+openapi: 3.0.3
+info:
+  title: Vinci Cyber Intelligence Attack service
+  description: Micro service de gestion des attaques pour le projet Vinci Cyber Intelligence. Permet de créer de nouvelles attaques en renseignant la cible au départ, de préciser un serveur et un exploit pour une attaque, d'indiquer le résultat et modifier les notes d'une attaque.
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:9004'
+    description: Development server
+paths:
+  /attacks:
+    post:
+      summary: Créer une nouvelle attaque
+      description: |
+        Permet de créer une nouvelle attaque en fournissant une cible, un serveur, un exploit, un statut, et des notes. 
+        Seule la cible est obligatoire au départ.
+
+        **Paramètres** : Aucun paramètre dans l'URL. Les données de l'attaque sont envoyées dans le corps de la requête.
+
+        **Préconditions** :
+          - La cible doit être spécifiée pour créer une attaque.
+          - Les champs `serveur` et `exploit` peuvent être ajoutés plus tard.
+        
+         **Corps de la requête** :
+          - `cible` (obligatoire) : La cible de l'attaque.
+        
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les données fournies ne sont pas valides.
+          - `409 Conflict` : Si une attaque avec les mêmes paramètres existe déjà.
+      requestBody:
+        description: Données de l'attaque à créer.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                target:
+                  type: integer
+                  description: La cible de l'attaque
+              required:
+                - target
+      responses:
+        '201':
+          description: Attaque créée avec succès
+        '400':
+          description: Données invalides fournies
+        '409':
+          description: Attaque avec cette cible déjà existante
+
+  /attacks/details/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID de la cible de l'attaque (obligatoire)
+        schema:
+          type: integer
+          example: 1
+
+    patch:
+      summary: Mettre à jour une attaque
+      description: |
+        Permet de préciser un serveur avec son adresse IP et un exploit avec son identifiant unique pour une attaque existante.
+
+        **Paramètres** :
+          - `id` : L'identifiant de l'attaque à mettre à jour.
+
+        **Préconditions** :
+          - L'attaque doit exister.
+          - Les champs `serveur` et `exploit` doivent être valides et renseignés.
+
+        **Corps de la requête** :
+          - `serveur` : Le nouveau serveur pour l'attaque.
+          - `exploit` : Le nouvel exploit à associer à l'attaque.
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les données fournies pour la mise à jour ne sont pas valides.
+          - `404 Not Found` : Si aucune attaque avec cet identifiant n'est trouvée.
+      requestBody:
+        description: Données de l'attaque à mettre à jour.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                server:
+                  type: string
+                  description: Le serveur associé à l'attaque
+                exploit:
+                  type: integer
+                  description: L'exploit utilisé pour l'attaque
+              required:
+                - server
+                - exploit
+      responses:
+        '200':
+          description: Attaque mise à jour avec succès
+        '400':
+          description: Données invalides fournies pour la mise à jour
+        '404':
+          description: Aucune attaque trouvée pour cet ID
+
+  /attacks/status/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identifiant de l'attaque
+        schema:
+          type: integer
+
+    patch:
+      summary: Mettre à jour le statut de l'attaque
+      description: |
+        Permet de suivre le statut de l'attaque. Une fois tous les éléments (cible, serveur, exploit) renseignés, 
+        l'attaque peut être lancée et son statut peut évoluer.
+        
+        **Statuts disponibles** :
+          - `prévue`
+          - `en cours`
+          - `réussie`
+          - `ratée`
+
+      requestBody:
+        description: Mise à jour du statut de l'attaque
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: Statut de l'attaque
+                  enum:
+                    - planned
+                    - in progress
+                    - successful
+                    - failed
+              required:
+                - status
+      responses:
+        '200':
+          description: Statut de l'attaque mis à jour avec succès
+        '400':
+          description: Données invalides fournies
+        '404':
+          description: Aucune attaque trouvée pour cet identifiant
+
+  /attacks/notes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identifiant de l'attaque
+        schema:
+          type: integer
+    patch:
+      summary: Mettre à jour les notes d'une attaque
+      description: |
+        Permet de modifier ou d'ajouter des notes à une attaque existante. Les utilisateurs peuvent 
+        mettre à jour ce champ à tout moment pour enregistrer des informations importantes sur l'attaque.
+      requestBody:
+        description: Notes à ajouter ou mettre à jour pour l'attaque
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+                  description: Notes associées à l'attaque
+      responses:
+        '200':
+          description: Notes mises à jour avec succès
+        '400':
+          description: Données invalides fournies
+        '404':
+          description: Aucune attaque trouvée pour cet identifiant
+
+components:
+  schemas:
+    attack:
+      type: object
+      properties:
+        target:
+          type: integer
+          description: L'identifiant unique de la cible de l'attaque
+        server:
+          type: string
+          description: L'adresse IP du serveur utilisé pour l'attaque
+        exploit:
+          type: integer
+          description: L'identifiant unique de l'exploit utilisé pour l'attaque
+        status:
+          type: string
+          description: Le statut de l'attaque (prévue, en cours, réussie, ratée)
+          enum:
+            - planned
+            - in progress
+            - successful
+            - failed
+        notes:
+          type: string
+          description: Notes sur l'attaque
+      required:
+        - target
+      example:
+        target: 1
+        server: '198.202.505.1'
+        exploit: 2
+        status: 'planned'
+        notes: 'Première attaque'
