@@ -12,13 +12,31 @@ info:
     et qu’on sait que ses services tournent sur la même machine (hébergement mutualisé) que ceux de la société B, il pourrait vouloir lancer une attaque sur la société B.
   version: 1.0.0
 servers:
-  - url: 'http://localhost:8080'
+  - url: 'http://localhost:9002'
     description: Development server
 paths:
 
   /cibles:
     get:
       summary: Lire toutes les cibles
+      description: |
+        Cette opération permet de récupérer la liste de toutes les cibles enregistrées dans le système. 
+        Les utilisateurs peuvent filtrer les résultats en fonction du nombre minimal de serveurs ou d'un chiffre d'affaires minimal.
+      parameters:
+        - name: nbServers
+          in: query
+          description: Nombre minimal de serveurs
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - name: revenue
+          in: query
+          description: Chiffre d'affaires minimal
+          required: false
+          schema:
+            type: integer
+            example: 100000
       responses:
         200:
           description: Retourne la liste de toutes les cibles
@@ -31,6 +49,10 @@ paths:
 
     post:
       summary: Créer une nouvelle cible
+      description: |
+        Cette opération permet à un utilisateur administrateur de créer une nouvelle cible. 
+        La cible est initialement créée avec un nombre de serveurs à zéro. Les informations nécessaires incluent le nom de l'entreprise, 
+        son nom de domaine, sa localisation, son nombre d'employés et son chiffre d'affaires.
       requestBody:
         description: Données de la cible à créer
         content:
@@ -53,6 +75,9 @@ paths:
 
     get:
       summary: Lire les détails d'une cible
+      description: |
+        Cette opération permet de récupérer les détails d'une cible spécifique en utilisant son identifiant unique. 
+        Si la cible n'est pas trouvée, une réponse 404 est retournée.
       responses:
         404:
           description: Aucune cible n'a été trouvée pour cet ID
@@ -65,6 +90,9 @@ paths:
 
     delete:
       summary: Supprimer une cible
+      description: |
+        Cette opération permet à un utilisateur administrateur de supprimer une cible spécifique en utilisant son identifiant unique. 
+        Si la cible n'est pas trouvée, une réponse 404 est retournée.
       responses:
         404:
           description: Aucune cible n'a été trouvée pour cet ID
@@ -73,6 +101,10 @@ paths:
 
     patch:
       summary: Modifier une cible
+      description: |
+        Cette opération permet à un utilisateur administrateur de modifier les informations d'une cible spécifique en utilisant son identifiant unique. 
+        Les informations modifiables incluent le nom de domaine, le nombre d'employés et le chiffre d'affaires. 
+        Si la cible n'est pas trouvée, une réponse 404 est retournée.
       requestBody:
         description: Données de la cible à modifier
         content:
@@ -85,37 +117,12 @@ paths:
         200:
           description: La cible a été modifiée
 
-  /cibles/search:
-    get:
-      summary: Rechercher des cibles
-      parameters:
-        - name: nbServers
-          in: query
-          description: Nombre minimal de serveurs
-          required: false
-          schema:
-            type: integer
-            example: 10
-        - name: revenue
-          in: query
-          description: Chiffre d'affaires minimal
-          required: false
-          schema:
-            type: integer
-            example: 100000
-      responses:
-        200:
-          description: Retourne la liste des cibles correspondant aux critères de recherche
-          content:
-            'application/json':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/cible'
-
   /cibles/colocated:
     get:
       summary: Trouver des cibles co-localisées
+      description: |
+        Cette opération permet de trouver des cibles qui sont co-localisées avec une entreprise déjà compromise. 
+        Les utilisateurs doivent fournir le nom de l'entreprise déjà compromise pour obtenir la liste des cibles co-localisées.
       parameters:
         - name: companyName
           in: query
