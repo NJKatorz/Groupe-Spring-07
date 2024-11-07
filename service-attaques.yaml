@@ -130,13 +130,13 @@ components:
       type: object
       properties:
         cible:
-          type: string
+          type: integer
           description: La cible de l'attaque
         serveur:
           type: string
           description: Le serveur utilisé pour l'attaque
         exploit:
-          type: string
+          type: integer
           description: L'exploit utilisé pour l'attaque
         statut:
           type: string
@@ -152,8 +152,8 @@ components:
       required:
         - cible
       example:
-        cible: 'Cible1'
-        serveur: 'Serveur1'
-        exploit: 'Exploit1'
+        cible: '1'
+        serveur: '198.202.505'
+        exploit: '1'
         statut: 'prévue'
         notes: 'Première attaque'
