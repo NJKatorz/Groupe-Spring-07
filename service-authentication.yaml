@@ -1,0 +1,120 @@
+openapi: 3.0.3
+info:
+  title: Vinci Cyber Intelligence Authentication Service
+  description: Microservice de gestion des identifiants et en charge de l'authentification pour le projet Vinci Cyber Intelligence. Permet l'authentification
+  version: 1.0.0
+servers:
+  - url: http://localhost:9006
+    description: Development server
+
+paths:
+
+  /authentication/connect:
+    post:
+      summary: Connecter l'utilisateur en lui retournant un token JWT
+      requestBody:
+        description: Identifiants de l'utilisateur
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Credentials'
+      responses:
+        400:
+          description: Les identifiants ne sont pas valides
+        401:
+          description: Mauvais nom d'utilisateur ou mot de passe
+        200:
+          description: Retourne un token JWT pour authentifier l'utilisateur
+          content:
+            'text/plain':
+              schema:
+                type: string
+                example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9...
+
+  /authentication/verify:
+    post:
+      summary: Vérifier un token JWT
+      requestBody:
+        description: Token JWT à vérifier
+        required: true
+        content:
+          'text/plain':
+            schema:
+              type: string
+              example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9...
+      responses:
+        401:
+          description: Token JWT invalide ou expiré
+        200:
+          description: Token vérifié avec succès, retourne le nom d'utilisateur
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: hacker01
+
+  /authentication/{username}:
+    parameters:
+      - name: username
+        in: path
+        description: Nom d'utilisateur
+        schema:
+          type: string
+
+    post:
+      summary: Créer des identifiants pour un utilisateur
+      requestBody:
+        description: Identifiants de l'utilisateur
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Credentials'
+      responses:
+        400:
+          description: Les identifiants ne sont pas valides
+        409:
+          description: Des identifiants existent déjà pour ce nom d'utilisateur
+        201:
+          description: Les identifiants ont été créés avec succès
+
+    put:
+      summary: Modifier les identifiants de l'utilisateur
+      requestBody:
+        description: Nouvelles informations de connexion de l'utilisateur
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Credentials'
+      responses:
+        400:
+          description: Les informations de connexion ne sont pas valides
+        404:
+          description: Aucun identifiant trouvé pour ce nom d'utilisateur
+        200:
+          description: Les identifiants ont été modifiés avec succès
+
+    delete:
+      summary: Supprimer les identifiants de l'utilisateur
+      responses:
+        404:
+          description: Aucun identifiant trouvé pour ce nom d'utilisateur
+        200:
+          description: Les identifiants ont été supprimés avec succès
+
+components:
+  schemas:
+    Credentials:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Nom d'utilisateur
+        password:
+          type: string
+          description: Mot de passe de l'utilisateur
+      example:
+        username: hacker01
+        password: securePassword123
