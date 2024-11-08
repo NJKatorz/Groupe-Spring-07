@@ -221,19 +221,6 @@ paths:
 
 components:
   schemas:
-    credentials:
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-      required:
-        - username
-        - password
-      example:
-        username: "Hacker007"
-        password: "password123"
 
     exploit:
       type: object
@@ -336,3 +323,63 @@ components:
         exploit: 1
         statut: "prévue"
         notes: "Première attaque"
+
+    credentials:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+      example:
+        username: "Hacker007"
+        password: "password123"
+
+    user:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Nom d'utilisateur unique
+        firstname:
+          type: string
+          description: Prénom de l'utilisateur
+        lastname:
+          type: string
+          description: Nom de famille de l'utilisateur
+        isAdmin:
+          type: boolean
+          description: Indique si l'utilisateur est un administrateur (true) ou un utilisateur standard (false)
+      example:
+        username: hacker01
+        firstname: John
+        lastname: Doe
+        isAdmin: false
+
+    userWithCredentials:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Nom d'utilisateur unique
+        firstname:
+          type: string
+          description: Prénom de l'utilisateur
+        lastname:
+          type: string
+          description: Nom de famille de l'utilisateur
+        isAdmin:
+          type: boolean
+          description: Indique si l'utilisateur est un administrateur
+        password:
+          type: string
+          description: Mot de passe de l'utilisateur
+      example:
+        username: hacker01
+        firstname: John
+        lastname: Doe
+        isAdmin: false
+        password: password123

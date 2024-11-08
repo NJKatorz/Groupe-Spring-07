@@ -8,7 +8,7 @@ info:
     nom d'utilisateur, le prénom, le nom de famille, et le statut d'administrateur.
   version: 1.0.0
 servers:
-  - url: http://localhost:9005
+  - url: 'http://localhost:9005'
     description: Development server
 
 paths:
@@ -27,7 +27,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/user'
 
   /users/{username}:
     parameters:
@@ -52,7 +52,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/user'
 
     post:
       summary: Créer un nouvel utilisateur
@@ -66,7 +66,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/UserWithAdminStatus'
+              $ref: '#/components/schemas/userWithCredentials'
       responses:
         400:
           description: Les données fournies sont invalides
@@ -87,7 +87,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/UserWithAdminStatus'
+              $ref: '#/components/schemas/userWithCredentials'
       responses:
         400:
           description: Les données fournies sont invalides
@@ -110,7 +110,7 @@ paths:
 
 components:
   schemas:
-    User:
+    user:
       type: object
       properties:
         username:
@@ -131,7 +131,7 @@ components:
         lastname: Doe
         isAdmin: false
 
-    UserWithAdminStatus:
+    userWithCredentials:
       type: object
       properties:
         username:
@@ -146,8 +146,12 @@ components:
         isAdmin:
           type: boolean
           description: Indique si l'utilisateur est un administrateur
+        password:
+          type: string
+          description: Mot de passe de l'utilisateur
       example:
         username: hacker01
         firstname: John
         lastname: Doe
         isAdmin: false
+        password: password123
