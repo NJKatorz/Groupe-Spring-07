@@ -1,12 +1,17 @@
 openapi: 3.0.3
 info:
   title: Vinci Cyber Intelligence Gateway
-  description: Point d’entrée unique pour l'ensemble des services du projet Vinci Cyber Intelligence. Permet de centraliser les requêtes aux différents microservices comme l'authentification, la gestion des utilisateurs, des exploits, des cibles, et des serveurs.
+  description: |
+    Microservice d'interface pour le projet Vinci Cyber Intelligence. 
+    Point d’entrée unique pour l'ensemble des services du projet Vinci Cyber Intelligence. 
+    Permet de centraliser les requêtes aux différents microservices comme l'authentification, 
+    la gestion des utilisateurs, des exploits, des cibles, et des serveurs.
   version: 1.0.0
 servers:
   - url: 'http://localhost:8080'
     description: Development server
 paths:
+
   /auth:
     post:
       summary: Authentification d'un utilisateur
@@ -17,10 +22,6 @@ paths:
           - `username` (obligatoire) : Le pseudo de l'utilisateur.
           - `password` (obligatoire) : Le mot de passe de l'utilisateur.
 
-        **Erreurs possibles** :
-          - `400 Bad Request` : Si les identifiants fournis sont incorrects.
-          - `401 Unauthorized` : Si l'authentification échoue.
-
       requestBody:
         description: Identifiants de l'utilisateur pour générer un token JWT
         content:
@@ -28,37 +29,96 @@ paths:
             schema:
               $ref: '#/components/schemas/credentials'
       responses:
-        '200':
-          description: Retourne un token d'authentification pour l'utilisateur
         '400':
-          description: Erreur d'identifiants invalides
+          description: Les identifiants fournies sont invalides
         '401':
           description: Erreur d'authentification
+        '200':
+          description: Retourne un token d'authentification pour l'utilisateur
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJhdXRoMCIsInBzZXVkbyI6IkNhdDRMaWZlIn0.LqfooEI-I9VTBo-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
-  /users/{pseudo}:
+  /users/{username}:
     parameters:
-      - name: pseudo
+      - name: username
         in: path
-        description: Pseudo de l'utilisateur
+        description: Nom d'utilisateur unique
         required: true
         schema:
           type: string
+          example: hacker01
+
     get:
-      summary: Récupérer les informations d'un utilisateur
+      summary: Récupérer les informations d'un utilisateur spécifique
       description: |
-        Permet de récupérer les informations détaillées d'un utilisateur en fonction de son pseudo.
-
-        **Paramètres** :
-          - `user` (obligatoire) : Le pseudo de l'utilisateur.
-
-        **Erreurs possibles** :
-          - `404 Not Found` : Si l'utilisateur avec ce pseudo n'existe pas.
-
+        Permet de récupérer les informations complètes d'un utilisateur spécifique grâce à son 
+        nom d'utilisateur. Si l'utilisateur n'est pas trouvé, un code d'erreur 404 est retourné.
       responses:
-        '200':
-          description: Les informations de l'utilisateur récupérées avec succès
-        '404':
-          description: L'utilisateur n'a pas été trouvé
+        404:
+          description: Aucun utilisateur trouvé avec ce nom d'utilisateur
+        200:
+          description: Retourne les données de l'utilisateur correspondant
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/user'
+
+    post:
+      summary: Créer un nouvel utilisateur
+      description: |
+        Crée un utilisateur dans le système en fournissant les informations nécessaires telles que 
+        le nom d'utilisateur, le prénom, le nom et le statut d'administrateur. Un code 201 indique 
+        que la création a été réussie, tandis qu'un code 409 est retourné en cas de conflit.
+      requestBody:
+        description: Données de l'utilisateur à créer
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/userWithCredentials'
+      responses:
+        400:
+          description: Les données fournies sont invalides
+        409:
+          description: Un utilisateur existe déjà avec ce nom d'utilisateur
+        201:
+          description: L'utilisateur a été créé avec succès
+
+    put:
+      summary: Modifier les informations d'un utilisateur
+      description: |
+        Met à jour les informations d'un utilisateur existant, y compris son prénom, son nom de 
+        famille et son statut d'administrateur. Si l'utilisateur n'est pas trouvé, un code 404 
+        est retourné.
+      requestBody:
+        description: Nouvelles données de l'utilisateur
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/userWithCredentials'
+      responses:
+        400:
+          description: Les données fournies sont invalides
+        404:
+          description: Aucun utilisateur trouvé avec ce nom d'utilisateur
+        200:
+          description: L'utilisateur a été modifié avec succès
+
+    delete:
+      summary: Supprimer un utilisateur
+      description: |
+        Permet de supprimer un utilisateur existant du système en utilisant son nom d'utilisateur.
+        Retourne un code 404 si l'utilisateur n'est pas trouvé et un code 200 si la suppression 
+        a été effectuée avec succès.
+      responses:
+        404:
+          description: Aucun utilisateur trouvé avec ce nom d'utilisateur
+        200:
+          description: L'utilisateur a été supprimé avec succès
 
   /exploits:
     get:
@@ -76,32 +136,38 @@ paths:
           description: Aucun exploit trouvé
 
     post:
-      summary: Créer un nouvel exploit
+      summary: Créer un exploit
       description: |
-        Permet de créer un nouvel exploit en fournissant les informations nécessaires. Seuls les champs obligatoires sont nécessaires pour la création.
+        L'utilisateur peut créer un exploit en fournissant les détails requis tels que
+        le nom, la description, l'auteur, le type de serveur, le guide pas à pas et l'état de 
+        validation. En cas de succès, l'exploit sera créé. Sinon en cas d'erreur, une réponse
+        d'erreur sera retournée.
+
+        **Préconditions** :
+          - Les informations fournies doivent être valides.
+          - Si un exploit avec le même identifiant existe déjà, une erreur sera retournée.
 
         **Corps de la requête** :
-          - `name` (obligatoire) : Nom de l'exploit.
-          - `description` (obligatoire) : Description de l'exploit.
-          - `author` (optionnel) : Auteur de l'exploit.
-          - `server_type` (optionnel) : Type de serveur affecté.
-          - `guide` (optionnel) : Guide étape par étape pour l'exploitation.
-          - `validated` (optionnel) : Indicateur de validation de l'exploit.
-
-        **Erreurs possibles** :
-          - `400 Bad Request` : Si les données fournies ne sont pas valides.
+          - `name` (requis) : Nom de l'exploit
+          - `description` (requis) : Description détaillée de l'exploit
+          - `author` (requis) : Auteur de l'exploit
+          - `server_type` (requis) : Type de serveur vulnérable à l'exploit
+          - `guide` (requis) : Guide pas à pas pour exploiter la vulnérabilité
+          - `validated` (optionnel) : Exploit validé ou non par l'administrateur, par défaut `false` si non spécifié.
 
       requestBody:
         description: Données de l'exploit à créer
         content:
-          application/json:
+          'application/json':
             schema:
               $ref: '#/components/schemas/exploit'
       responses:
-        '201':
-          description: Exploit créé avec succès
         '400':
-          description: Données invalides
+          description: Données invalides fournies
+        409:
+          description: Un exploit existe déjà avec cet id
+        201:
+          description: L'exploit a été créé avec succès
 
   /cibles:
     get:
@@ -139,7 +205,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/cible'
+              $ref: '#/components/schemas/target'
       responses:
         '201':
           description: Cible créée avec succès
@@ -210,7 +276,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/attaque'
+              $ref: '#/components/schemas/attack'
       responses:
         '201':
           description: Attaque créée avec succès
@@ -221,35 +287,51 @@ paths:
 
 components:
   schemas:
-
     exploit:
+      description: |
+        Un exploit est une méthode permettant de tirer profit d'une vulnérabilité connue sur 
+        un serveur. Il comprend un identifiant unique, un nom, une description, un auteur, 
+        un type de serveur, un guide pas à pas pour réaliser l'attaque et un état de validation.
       type: object
       properties:
         exploit_id:
           type: integer
+          description: Identifiant unique de l'exploit
         name:
           type: string
+          description: Nom de l'exploit
         description:
           type: string
+          description: Description détaillée de l'exploit, expliquant la vulnérabilité
         author:
           type: string
+          description: Auteur de l'exploit, personne ayant découvert la vulnérabilité
         server_type:
           type: string
+          description: Type de serveur vulnérable à l'exploit
         guide:
           type: string
+          description: Guide pas à pas pour exploiter la vulnérabilité, expliquant les étapes afin
+            de réaliser l'attaque
         validated:
           type: boolean
+          description: Exploit validé ou non par l'administrateur
       required:
         - name
         - description
+        - author
+        - server_type
+        - guide
       example:
-        name: "Exploit SQL Injection"
-        description: "Exploitation d'une vulnérabilité SQL"
-        author: "John Doe"
-        server_type: "Web"
-        validated: true
+        exploit_id: 1
+        name: "Buffer Overflow Attack"
+        description: "Exploit visant une vulnérabilité de débordement de mémoire tampon sur les serveurs."
+        author: "Nicolas Jackson"
+        server_type: "Linux"
+        guide: "1) Identifier la taille du tampon. 2) Injecter un code malveillant. 3) Exécuter le payload."
+        validated: false
 
-    cible:
+    target:
       type: object
       properties:
         companyName:
@@ -278,14 +360,19 @@ components:
       properties:
         ip:
           type: string
-        entreprise:
+          description: L'adresse IP du serveur
+        company:
           type: string
+          description: L'entreprise hébergeant le serveur
         type:
           type: string
+          description: Le type de serveur (web, base de données, etc.)
         technology:
           type: string
-        valid:
+          description: La technologie utilisée
+        validated:
           type: boolean
+          description: Le serveur est-il validé ?
       required:
         - adresse_ip
         - entreprise_hebergeante
@@ -297,31 +384,36 @@ components:
         technology: "Apache"
         valid: true
 
-    attaque:
+    attack:
       type: object
       properties:
-        cible:
+        target:
           type: integer
-        serveur:
+          description: L'identifiant unique de la cible de l'attaque
+        server:
           type: string
+          description: L'adresse IP du serveur utilisé pour l'attaque
         exploit:
           type: integer
-        statut:
+          description: L'identifiant unique de l'exploit utilisé pour l'attaque
+        status:
           type: string
+          description: Le statut de l'attaque (prévue, en cours, réussie, ratée)
           enum:
-            - prévue
-            - en cours
-            - réussie
-            - ratée
+            - planned
+            - in progress
+            - successful
+            - failed
         notes:
           type: string
+          description: Notes sur l'attaque
       required:
-        - cible
+        - target
       example:
         cible: 1
         serveur: "198.202.505"
         exploit: 1
-        statut: "prévue"
+        statut: "in progress"
         notes: "Première attaque"
 
     credentials:
@@ -354,9 +446,9 @@ components:
           type: boolean
           description: Indique si l'utilisateur est un administrateur (true) ou un utilisateur standard (false)
       example:
-        username: hacker01
-        firstname: John
-        lastname: Doe
+        username: "Hacker007"
+        firstname: "John"
+        lastname: "Doe"
         isAdmin: false
 
     userWithCredentials:
@@ -378,8 +470,8 @@ components:
           type: string
           description: Mot de passe de l'utilisateur
       example:
-        username: hacker01
-        firstname: John
-        lastname: Doe
+        username: "Hacker007"
+        firstname: "John"
+        lastname: "Doe"
         isAdmin: false
-        password: password123
+        password: "password123"

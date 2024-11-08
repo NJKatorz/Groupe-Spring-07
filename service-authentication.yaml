@@ -145,5 +145,5 @@ components:
           type: string
           description: Mot de passe de l'utilisateur, requis pour la connexion et sécurisé
       example:
-        username: hacker01
-        password: securePassword123
+        username: "hacker01"
+        password: "securePassword123"

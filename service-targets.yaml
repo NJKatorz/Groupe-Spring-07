@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Vinci Cyber Intelligence Cible service
+  title: Vinci Cyber Intelligence Target service
   description: |
     Microservice de gestion des cibles. Ce service permet aux hackers d'enregistrer des cibles potentielles pour leurs attaques. 
     Chaque cible doit être décrite avec précision, incluant le nom de l’entreprise, son nom de domaine, sa localisation, son nombre d’employés, 
@@ -16,7 +16,7 @@ servers:
     description: Development server
 paths:
 
-  /cibles:
+  /targets:
     get:
       summary: Lire toutes les cibles
       description: |
@@ -45,7 +45,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/cible'
+                  $ref: '#/components/schemas/target'
 
     post:
       summary: Créer une nouvelle cible
@@ -58,14 +58,14 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/cible'
+              $ref: '#/components/schemas/target'
       responses:
         201:
           description: La cible a été créée
         401:
           description: L'utilisateur n'est pas un administrateur
 
-  /cibles/{id}:
+  /targets/{id}:
     parameters:
       - name: id
         in: path
@@ -88,7 +88,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/cible'
+                $ref: '#/components/schemas/target'
 
     delete:
       summary: Supprimer une cible
@@ -112,7 +112,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/cible'
+              $ref: '#/components/schemas/target'
       responses:
         404:
           description: Aucune cible n'a été trouvée pour cet ID
@@ -121,7 +121,7 @@ paths:
         200:
           description: La cible a été modifiée
 
-  /cibles/colocated:
+  /targets/colocated:
     get:
       summary: Trouver des cibles co-localisées
       description: |
@@ -143,11 +143,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/cible'
+                  $ref: '#/components/schemas/target'
 
 components:
   schemas:
-    cible:
+    target:
       type: object
       properties:
         id:
@@ -159,10 +159,10 @@ components:
         domain:
           type: string
           description: Nom de domaine de la cible
-        localisation:
+        location:
           type: string
           description: Localisation de la cible
-        nbEmploys:
+        nbEmployees:
           type: integer
           description: Nombre d'employés de la cible
         nbServers:
@@ -173,9 +173,9 @@ components:
           description: Chiffre d'affaires de la cible
       example:
         id: 1
-        companyName: My Company
-        domain: mycompany.com
-        localisation: Bruxelles
-        nbEmploys: 100
+        companyName: "My Company"
+        domain: "mycompany.com"
+        location: "Bruxelles"
+        nbEmployees: 100
         nbServers: 15
         revenue: 210000

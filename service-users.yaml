@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Vinci Cyber Intelligence Users Service
+  title: Vinci Cyber Intelligence User Service
   description: |
     Microservice de gestion des utilisateurs pour le projet Vinci Cyber Intelligence. 
     Ce service permet aux administrateurs et utilisateurs de créer, lire, modifier et supprimer des 
@@ -126,9 +126,9 @@ components:
           type: boolean
           description: Indique si l'utilisateur est un administrateur (true) ou un utilisateur standard (false)
       example:
-        username: hacker01
-        firstname: John
-        lastname: Doe
+        username: "hacker01"
+        firstname: "John"
+        lastname: "Doe"
         isAdmin: false
 
     userWithCredentials:
@@ -150,8 +150,8 @@ components:
           type: string
           description: Mot de passe de l'utilisateur
       example:
-        username: hacker01
-        firstname: John
-        lastname: Doe
+        username: "hacker01"
+        firstname: "John"
+        lastname: "Doe"
         isAdmin: false
-        password: password123
+        password: "password123"
