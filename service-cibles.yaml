@@ -62,6 +62,8 @@ paths:
       responses:
         201:
           description: La cible a été créée
+        401:
+          description: L'utilisateur n'est pas un administrateur
 
   /cibles/{id}:
     parameters:
@@ -114,6 +116,8 @@ paths:
       responses:
         404:
           description: Aucune cible n'a été trouvée pour cet ID
+        401:
+          description: L'utilisateur n'est pas un administrateur
         200:
           description: La cible a été modifiée
 
