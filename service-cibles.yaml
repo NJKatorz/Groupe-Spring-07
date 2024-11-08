@@ -23,14 +23,14 @@ paths:
         Cette opération permet de récupérer la liste de toutes les cibles enregistrées dans le système. 
         Les utilisateurs peuvent filtrer les résultats en fonction du nombre minimal de serveurs ou d'un chiffre d'affaires minimal.
       parameters:
-        - name: nbServers
+        - name: nbServeurs
           in: query
           description: Nombre minimal de serveurs
           required: false
           schema:
             type: integer
             example: 10
-        - name: revenue
+        - name: ca_min
           in: query
           description: Chiffre d'affaires minimal
           required: false
@@ -128,7 +128,7 @@ paths:
         Cette opération permet de trouver des cibles qui sont co-localisées avec une entreprise déjà compromise. 
         Les utilisateurs doivent fournir le nom de l'entreprise déjà compromise pour obtenir la liste des cibles co-localisées.
       parameters:
-        - name: companyName
+        - name: nomEntreprise
           in: query
           description: Nom de l'entreprise déjà compromise
           required: true
@@ -153,7 +153,7 @@ components:
         id:
           type: integer
           description: Identifiant unique de la cible
-        companyName:
+        nomEntreprise:
           type: string
           description: Nom de l'entreprise
         domain:
@@ -162,20 +162,20 @@ components:
         localisation:
           type: string
           description: Localisation de la cible
-        nbEmploys:
+        nbEmployees:
           type: integer
           description: Nombre d'employés de la cible
-        nbServers:
+        nbServeurs:
           type: integer
           description: Nombre de serveurs de la cible
-        revenue:
+        chiffreAffaires:
           type: integer
           description: Chiffre d'affaires de la cible
       example:
         id: 1
-        companyName: My Company
+        nomEntreprise: My Company
         domain: mycompany.com
         localisation: Bruxelles
-        nbEmploys: 100
-        nbServers: 15
-        revenue: 210000
+        nbEmployees: 100
+        nbServeurs: 15
+        chiffreAffaires: 210000
