@@ -111,6 +111,11 @@ paths:
 components:
   schemas:
     user:
+      description: |
+        Un utilisateur est une personne enregistrée dans le système. Il peut être un administrateur
+        ou un utilisateur standard. Les informations de l'utilisateur incluent le nom d'utilisateur,
+        le prénom, le nom de famille et le rôle permettant de savoir s'il est un utilisateur standard
+        ou un utilisateur administrateur.
       type: object
       properties:
         username:
@@ -132,6 +137,13 @@ components:
         isAdmin: false
 
     userWithCredentials:
+      description: |
+        Un utilisateur avec ses informations d'identification est une personne enregistrée comprenant 
+        à la fois les informations personnelles et les informations d'authentification pour 
+        la création de comptes ou la mise à jour des utilisateurs.
+        Il peut être un administrateur ou un utilisateur standard. Les informations de l'utilisateur incluent
+        le nom d'utilisateur, le prénom, le nom de famille, le rôle permettant de savoir s'il est un utilisateur
+        standard ou un utilisateur administrateur, et le mot de passe.
       type: object
       properties:
         username:

@@ -179,6 +179,10 @@ paths:
 components:
   schemas:
     attack:
+      description: |
+        Une attaque est une opération malveillante visant à exploiter une cible à l'aide d'un exploit
+        et d'un serveur. Elle est associée à une cible, un serveur, un exploit, un statut (prévu, en cours,
+        réussi, raté) et des notes.
       type: object
       properties:
         target:

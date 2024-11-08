@@ -8,6 +8,20 @@ servers:
     description: Development server
 paths:
   /servers:
+    get:
+      summary: Consulter tous les serveurs
+      description: |
+        Permet de récupérer la liste des serveurs associés aux différentes cibles dans le système.
+
+        **Erreurs possibles** :
+          - `404 Not Found` : Si aucun serveur n'est trouvé.
+
+      responses:
+        '200':
+          description: Liste des serveurs récupérée avec succès
+        '404':
+          description: Aucun serveur trouvé
+
     post:
       summary: Créer un nouveau serveur
       description: |
@@ -153,6 +167,10 @@ paths:
 components:
   schemas:
     server:
+      description: |
+        Un serveur est une machine associée à une cible sur laquelle une attaque peut être réalisée.
+        Il est associé à une cible et contient des informations telles que l'adresse IP, 
+        l'entreprise hébergeante, le type de serveur, la technologie utilisée et le statut de validation.
       type: object
       properties:
         ip:

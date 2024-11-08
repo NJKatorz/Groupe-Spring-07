@@ -148,6 +148,10 @@ paths:
 components:
   schemas:
     target:
+      description: |
+        Une cible représente une entreprise ou une organisation visée pour une potentielle attaque.
+        Elle contient des informations telles que le nom de l'entreprise, le domaine, la localisation,
+        le nombre d'employés, le nombre de serveurs et le chiffre d'affaires.
       type: object
       properties:
         id:

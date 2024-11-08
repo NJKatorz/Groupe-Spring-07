@@ -89,6 +89,9 @@ paths:
 
     put:
       summary: Modifier les informations d'un utilisateur
+      security:
+        - jwt:
+          - Connecté en tant qu'utilisateur
       description: |
         Met à jour les informations d'un utilisateur existant, y compris son prénom, son nom de 
         famille et son statut d'administrateur. Si l'utilisateur n'est pas trouvé, un code 404 
@@ -110,6 +113,9 @@ paths:
 
     delete:
       summary: Supprimer un utilisateur
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur
       description: |
         Permet de supprimer un utilisateur existant du système en utilisant son nom d'utilisateur.
         Retourne un code 404 si l'utilisateur n'est pas trouvé et un code 200 si la suppression 
@@ -122,21 +128,47 @@ paths:
 
   /exploits:
     get:
-      summary: Consulter tous les exploits
+      summary: Lire les détails de tous les exploits
       description: |
-        Permet de récupérer la liste de tous les exploits disponibles dans le système.
+        Cela permettra à l'utilistateur de récupérer la liste de tous les exploits 
+        comprenant les détails tels que leur nom, description, auteur, type de serveur, guide et 
+        état de validation. L'utilisateur peut également effectuer des recherches en fonction de
+        l'auteur ou du type de serveur vulnérable.
 
-        **Erreurs possibles** :
-          - `404 Not Found` : Si aucun exploit n'est trouvé.
+        **Paramètres** :
+          - `author` : Le nom de l'auteur dont les exploits sont recherchés.
+          - `serverType` : Type de serveur pour filtrer les exploits.
 
+      parameters:
+        - name: author
+          in: query
+          description: Nom de l'auteur de l'exploit
+          required: false
+          schema:
+            type: string
+            example: Nicolas Jackson
+        - name: serverType
+          in: query
+          description: Type de serveur vulnérable
+          required: false
+          schema:
+            type: string
+            example: Backup
       responses:
-        '200':
-          description: Liste des exploits récupérée avec succès
-        '404':
-          description: Aucun exploit trouvé
+        200:
+          description: Retourne la liste de tous les exploits
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/exploit'
 
     post:
       summary: Créer un exploit
+      security:
+        - jwt:
+            - Connecté en tant qu'auteur de l'exploit
       description: |
         L'utilisateur peut créer un exploit en fournissant les détails requis tels que
         le nom, la description, l'auteur, le type de serveur, le guide pas à pas et l'état de 
@@ -151,7 +183,7 @@ paths:
           - `name` (requis) : Nom de l'exploit
           - `description` (requis) : Description détaillée de l'exploit
           - `author` (requis) : Auteur de l'exploit
-          - `server_type` (requis) : Type de serveur vulnérable à l'exploit
+          - `serverType` (requis) : Type de serveur vulnérable à l'exploit
           - `guide` (requis) : Guide pas à pas pour exploiter la vulnérabilité
           - `validated` (optionnel) : Exploit validé ou non par l'administrateur, par défaut `false` si non spécifié.
 
@@ -169,48 +201,324 @@ paths:
         201:
           description: L'exploit a été créé avec succès
 
-  /cibles:
-    get:
-      summary: Consulter toutes les cibles
-      description: |
-        Permet de récupérer la liste des cibles existantes dans le système, incluant les entreprises, domaines, et autres caractéristiques.
+  /exploits/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Identifiant unique de l'exploit
+        required: true
+        schema:
+          type: integer
+          example: 1
 
-        **Erreurs possibles** :
-          - `404 Not Found` : Si aucune cible n'est trouvée.
+    get:
+      summary: Récupérer les détails d'un exploit spécifique
+      description: |
+        Permet de récupérer les détails d'un exploit spécifique en utilisant son identifiant unique. 
+        Si l'exploit n'est pas trouvé, un code d'erreur 404 est retourné.
+      responses:
+        404:
+          description: Aucun exploit trouvé avec cet identifiant
+        200:
+          description: Retourne les détails de l'exploit correspondant
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/exploit'
+
+    delete:
+      summary: Supprimer un exploit
+      description: |
+        Permet de supprimer un exploit existant du système en utilisant son identifiant unique.
+        Retourne un code 404 si l'exploit n'est pas trouvé et un code 200 si la suppression 
+        a été effectuée avec succès.
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur (auteur de l'exploit)
+      responses:
+        404:
+          description: Aucun exploit trouvé avec cet identifiant
+        200:
+          description: L'exploit a été supprimé avec succès
+
+  /users/{username}/exploits:
+    parameters:
+      - name: username
+        in: path
+        description: Nom d'utilisateur unique
+        required: true
+        schema:
+          type: string
+          example: hacker01
+
+    get:
+      summary: Récupérer les exploits créés par un utilisateur spécifique
+      description: |
+        Permet de récupérer les exploits créés par un utilisateur spécifique grâce à son nom d'utilisateur. 
+        Si l'utilisateur n'est pas trouvé, un code d'erreur 404 est retourné.
+      responses:
+        404:
+          description: Aucun utilisateur trouvé avec ce nom d'utilisateur
+        200:
+          description: Retourne les exploits créés par l'utilisateur correspondant
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/exploit'
+
+  /exploits/description/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Identifiant de l'exploit
+        required: true
+        schema:
+          type: integer
+          example: 1
+
+    patch:
+      summary: Modifier la description d'un exploit
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur (auteur de l'exploit)
+      description: |
+        Cela permettra à l'utilisateur de modifier la description d'un exploit existant en 
+        fournissant son identifiant unique passé en paramètre dans l'URL. Si l'exploit est trouvé, 
+        sa description est modifiée. Sinon, une réponse d'erreur sera retournée.
+
+        **Paramètres** :
+          - `id` : Identifiant de l'exploit à modifier.
+
+        **Corps de la requête** :
+          - `description` : Nouvelle description de l'exploit.
+
+      requestBody:
+        description: Nouvelle description de l'exploit correspondante
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: Description d'un exploit
+      responses:
+        '400':
+          description: Données invalides fournies
+        404:
+          description: Aucun exploit n'a été trouvé pour cet identifiant
+        200:
+          description: La description de l'exploit a été modifiée
+
+
+  /exploits/guide/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Identifiant de l'exploit
+        required: true
+        schema:
+          type: integer
+          example: 1
+
+    patch:
+      summary: Modifier le guide d'un exploit
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur (auteur de l'exploit)
+      description: |
+        Cela permettra à l'utilisateur de modifier le guide pas à pas d'un exploit existant en 
+        fournissant son identifiant unique passé en paramètre dans l'URL. Si l'exploit est trouvé, 
+        son guide est modifié. Sinon, une réponse d'erreur sera retournée.
+
+        **Paramètres** :
+          - `id` : Identifiant de l'exploit.
+
+        **Corps de la requête** :
+          - `guide` : Nouveau guide pas à pas pour l'exploit.
+
+      requestBody:
+        description: Nouvelle guide de l'exploit correspondante
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: Guide pas à pas d'un exploit
+      responses:
+        '400':
+          description: Données invalides fournies
+        404:
+          description: Aucun exploit n'a été trouvé pour cet identifiant
+        200:
+          description: La description de l'exploit a été modifiée
+
+  /exploits/validate/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Identifiant de l'exploit
+        required: true
+        schema:
+          type: integer
+          example: 1
+    patch:
+      summary: Valider un exploit
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur administrateur
+      description: |
+        Seuls les utilisateurs administrateurs peuvent valider un exploit en modifiant 
+        son état de validation basé sur son identifiant unique en paramètre dans l'URL. 
+        Cela permettra de marquer un exploit comme validé ou non validé. Si l'exploit est trouvé, 
+        son état de validation sera modifié. Sinon, une réponse d'erreur sera retournée.
+
+        **Paramètres** :
+          - `id` : Identifiant de l'exploit à valider ou invalider.
 
       responses:
-        '200':
-          description: Liste des cibles récupérée avec succès
-        '404':
-          description: Aucune cible trouvée
+        404:
+          description: Aucun exploit n'a été trouvé pour cet identifiant
+        200:
+          description: L'exploit a été validé
 
+  /target:
+    get:
+      summary: Lire toutes les cibles
+      description: |
+        Cette opération permet de récupérer la liste de toutes les cibles enregistrées dans le système. 
+        Les utilisateurs peuvent filtrer les résultats en fonction du nombre minimal de serveurs ou d'un chiffre d'affaires minimal.
+      parameters:
+        - name: nbServers
+          in: query
+          description: Nombre minimal de serveurs
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - name: revenue
+          in: query
+          description: Chiffre d'affaires minimal
+          required: false
+          schema:
+            type: integer
+            example: 100000
+      responses:
+        200:
+          description: Retourne la liste de toutes les cibles
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/target'
     post:
       summary: Créer une nouvelle cible
       description: |
-        Permet de créer une nouvelle cible avec les informations spécifiées. La création nécessite au moins le nom de l'entreprise et son domaine.
-
-        **Corps de la requête** :
-          - `companyName` (obligatoire) : Nom de l'entreprise cible.
-          - `domain` (obligatoire) : Domaine de l'entreprise cible.
-          - `localisation` (optionnel) : Localisation géographique de la cible.
-          - `nbEmploys` (optionnel) : Nombre d'employés de l'entreprise.
-          - `nbServers` (optionnel) : Nombre de serveurs associés à la cible.
-          - `revenue` (optionnel) : Chiffre d'affaires de l'entreprise.
-
-        **Erreurs possibles** :
-          - `400 Bad Request` : Si les données fournies ne sont pas valides.
-
+        Cette opération permet à un utilisateur administrateur de créer une nouvelle cible. 
+        La cible est initialement créée avec un nombre de serveurs à zéro. Les informations nécessaires incluent le nom de l'entreprise, 
+        son nom de domaine, sa localisation, son nombre d'employés et son chiffre d'affaires.
       requestBody:
         description: Données de la cible à créer
         content:
-          application/json:
+          'application/json':
             schema:
               $ref: '#/components/schemas/target'
       responses:
-        '201':
-          description: Cible créée avec succès
-        '400':
-          description: Données invalides
+        201:
+          description: La cible a été créée
+        401:
+          description: L'utilisateur n'est pas un administrateur
+
+  /targets/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: ID de la cible
+        required: true
+        schema:
+          type: integer
+          example: 1
+
+    get:
+      summary: Lire les détails d'une cible
+      description: |
+        Cette opération permet de récupérer les détails d'une cible spécifique en utilisant son identifiant unique. 
+        Si la cible n'est pas trouvée, une réponse 404 est retournée.
+      responses:
+        404:
+          description: Aucune cible n'a été trouvée pour cet ID
+        200:
+          description: Retourne les détails de la cible
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/target'
+
+    delete:
+      summary: Supprimer une cible
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur administrateur
+      description: |
+        Cette opération permet à un utilisateur administrateur de supprimer une cible spécifique en utilisant son identifiant unique. 
+        Si la cible n'est pas trouvée, une réponse 404 est retournée.
+      responses:
+        404:
+          description: Aucune cible n'a été trouvée pour cet ID
+        200:
+          description: La cible a été supprimée
+
+    patch:
+      summary: Modifier une cible
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur administrateur
+      description: |
+        Cette opération permet à un utilisateur administrateur de modifier les informations d'une cible spécifique en utilisant son identifiant unique. 
+        Les informations modifiables incluent le nom de domaine, le nombre d'employés et le chiffre d'affaires. 
+        Si la cible n'est pas trouvée, une réponse 404 est retournée.
+      requestBody:
+        description: Données de la cible à modifier
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/target'
+      responses:
+        404:
+          description: Aucune cible n'a été trouvée pour cet ID
+        401:
+          description: L'utilisateur n'est pas un administrateur
+        200:
+          description: La cible a été modifiée
+
+  /targets/colocated:
+    get:
+      summary: Trouver des cibles co-localisées
+      description: |
+        Cette opération permet de trouver des cibles qui sont co-localisées avec une entreprise déjà compromise. 
+        Les utilisateurs doivent fournir le nom de l'entreprise déjà compromise pour obtenir la liste des cibles co-localisées.
+      parameters:
+        - name: companyName
+          in: query
+          description: Nom de l'entreprise déjà compromise
+          required: true
+          schema:
+            type: string
+            example: Entreprise A
+      responses:
+        200:
+          description: Retourne la liste des cibles co-localisées
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/target'
 
   /servers:
     get:
@@ -228,62 +536,339 @@ paths:
           description: Aucun serveur trouvé
 
     post:
-      summary: Ajouter un nouveau serveur
+      summary: Créer un nouveau serveur
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur
       description: |
-        Permet d'ajouter un serveur à une cible existante. Un serveur doit avoir une adresse IP, un type, et un hébergeur.
+        Permet de créer un nouveau serveur en fournissant les informations requises dans le corps de la requête. Cette opération met également à jour le nombre de serveurs pour l'entreprise associée.
+
+        **Paramètres** : Aucun paramètre dans l'URL. Les informations du serveur sont envoyées dans le corps de la requête.
+
+        **Préconditions** :
+          - Toutes les informations nécessaires pour créer le serveur doivent être fournies.
 
         **Corps de la requête** :
-          - `ip` (obligatoire) : Adresse IP du serveur.
-          - `entreprise` (obligatoire) : Nom de l'entreprise hébergeant le serveur.
-          - `type` (obligatoire) : Type du serveur (ex. Web, FTP, etc.).
-          - `technology` (optionnel) : Technologie utilisée par le serveur.
-          - `valid` (optionnel) : Statut de validation du serveur.
+          - `ip` (obligatoire) : L'adresse IP unique du serveur.
+          - `entreprise` (obligatoire) : Le nom de l'entreprise à laquelle est associé le serveur.
+          - `type` (obligatoire) : Le type de serveur (web, base de données, etc.).
+          - `technology` (obligatoire) : La technologie utilisée par le serveur (ex. : apache).
+          - `valid` (optionnel) : Statut de validation du serveur, par défaut `false` si non spécifié.
 
         **Erreurs possibles** :
           - `400 Bad Request` : Si les données fournies ne sont pas valides.
-
+          - `409 Conflict` : Si un serveur avec la même adresse IP existe déjà.
       requestBody:
-        description: Données du serveur à ajouter
+        description: Données du serveur à créer.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/server'
       responses:
         '201':
-          description: Serveur ajouté avec succès
+          description: Serveur créé avec succès
         '400':
-          description: Données invalides
+          description: Données invalides fournies
+        '409':
+          description: Serveur avec cette adresse IP déjà existant
 
-  /attaques:
-    post:
-      summary: Créer une nouvelle attaque
+  /servers/{ip}:
+    parameters:
+      - name: ip
+        in: path
+        required: true
+        description: Adresse IP du serveur (obligatoire)
+        schema:
+          type: string
+    get:
+      summary: Récupérer les détails d'un serveur
       description: |
-        Permet de créer une nouvelle attaque en associant une cible, un serveur, et un exploit. Le statut de l'attaque est également spécifié. Par défaut, l'attaque est marquée comme `prévue`.
+        Permet de récupérer les informations détaillées d'un serveur spécifique à l'aide de son adresse IP.
 
-        **Corps de la requête** :
-          - `cible` (obligatoire) : Cible de l'attaque.
-          - `serveur` (optionnel) : Serveur affecté à l'attaque.
-          - `exploit` (optionnel) : Exploit utilisé pour l'attaque.
-          - `statut` (optionnel) : Statut de l'attaque (prévu, en cours, réussi, raté).
-          - `notes` (optionnel) : Notes liées à l'attaque.
+        **Paramètres** :
+          - `ip` (obligatoire) : L'adresse IP du serveur à récupérer.
+
+        **Préconditions** :
+          - L'adresse IP doit correspondre à un serveur existant dans le système.
 
         **Erreurs possibles** :
-          - `400 Bad Request` : Données invalides.
-          - `409 Conflict` : Attaque déjà existante avec ces mêmes paramètres.
+          - `404 Not Found` : Si aucun serveur avec cette adresse IP n'est trouvé.
+      responses:
+        '200':
+          description: Détails du serveur récupérés avec succès
+        '404':
+          description: Aucun serveur trouvé pour cette adresse IP
 
+    put:
+      summary: Mettre à jour un serveur
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur
+      description: |
+        Permet de mettre à jour les informations d'un serveur existant, en modifiant ses propriétés telles que le type, la technologie et le statut de validation.
+
+        **Paramètres** :
+          - `ip` (obligatoire) : L'adresse IP du serveur à mettre à jour.
+
+        **Préconditions** :
+          - L'adresse IP doit correspondre à un serveur existant.
+          - Seuls les administrateurs peuvent modifier le champ `valid`.
+
+        **Corps de la requête** :
+          - `entreprise` (optionnel) : Nom de l'entreprise hébergeant le serveur.
+          - `type` (optionnel) : Type de serveur.
+          - `technology` (optionnel) : Technologie utilisée.
+          - `valid` (optionnel) : Statut de validation (réservé aux administrateurs).
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les données fournies pour la mise à jour ne sont pas valides.
+          - `403 Forbidden` : Accès refusé pour la modification du champ `valid` si l'utilisateur n'est pas administrateur.
+          - `404 Not Found` : Si aucun serveur avec cette adresse IP n'est trouvé.
       requestBody:
-        description: Données de l'attaque à créer
+        description: Données du serveur à mettre à jour.
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/attack'
+              $ref: '#/components/schemas/server'
+      responses:
+        '200':
+          description: Serveur mis à jour avec succès
+        '400':
+          description: Données invalides fournies pour la mise à jour
+        '403':
+          description: Accès refusé pour la modification du statut de validation
+        '404':
+          description: Aucun serveur trouvé pour cette adresse IP
+
+    delete:
+      summary: Supprimer un serveur
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur
+      description: |
+        Supprime un serveur existant en fonction de son adresse IP. La suppression d'un serveur ajuste automatiquement le nombre de serveurs de l'entreprise associée.
+
+        **Paramètres** :
+          - `ip` (obligatoire) : L'adresse IP du serveur à supprimer.
+
+        **Préconditions** :
+          - L'adresse IP doit correspondre à un serveur existant.
+
+        **Erreurs possibles** :
+          - `404 Not Found` : Si aucun serveur avec cette adresse IP n'est trouvé.
+      responses:
+        '200':
+          description: Serveur supprimé avec succès
+        '404':
+          description: Aucun serveur trouvé pour cette adresse IP
+
+  /servers/{ip}/validate:
+    patch:
+      summary: Valider un serveur
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur administrateur
+      description: |
+        Permet à un utilisateur avec des privilèges administratifs de valider un serveur spécifique, en utilisant son adresse IP.
+
+        **Paramètres** :
+          - `ip` (obligatoire) : L'adresse IP du serveur à valider.
+
+        **Préconditions** :
+          - Seuls les administrateurs peuvent effectuer cette action.
+          - L'adresse IP doit correspondre à un serveur existant.
+
+        **Erreurs possibles** :
+          - `403 Forbidden` : Accès refusé si l'utilisateur n'est pas administrateur.
+          - `404 Not Found` : Si aucun serveur avec cette adresse IP n'est trouvé.
+      responses:
+        '200':
+          description: Serveur validé avec succès
+        '403':
+          description: Accès refusé pour validation du serveur
+        '404':
+          description: Aucun serveur trouvé pour cette adresse IP
+
+  /attacks:
+    post:
+      summary: Créer une nouvelle attaque
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur
+      description: |
+        Permet de créer une nouvelle attaque en fournissant une cible, un serveur, un exploit, un statut, et des notes. 
+        Seule la cible est obligatoire au départ.
+
+        **Paramètres** : Aucun paramètre dans l'URL. Les données de l'attaque sont envoyées dans le corps de la requête.
+
+        **Préconditions** :
+          - La cible doit être spécifiée pour créer une attaque.
+          - Les champs `serveur` et `exploit` peuvent être ajoutés plus tard.
+
+         **Corps de la requête** :
+          - `cible` (obligatoire) : La cible de l'attaque.
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les données fournies ne sont pas valides.
+          - `409 Conflict` : Si une attaque avec les mêmes paramètres existe déjà.
+      requestBody:
+        description: Données de l'attaque à créer.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                target:
+                  type: integer
+                  description: La cible de l'attaque
+              required:
+                - target
       responses:
         '201':
           description: Attaque créée avec succès
         '400':
-          description: Données invalides
+          description: Données invalides fournies
         '409':
-          description: Attaque déjà existante
+          description: Attaque avec cette cible déjà existante
+
+  /attacks/details/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID de la cible de l'attaque (obligatoire)
+        schema:
+          type: integer
+          example: 1
+
+    patch:
+      summary: Mettre à jour une attaque
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur
+      description: |
+        Permet de préciser un serveur avec son adresse IP et un exploit avec son identifiant unique pour une attaque existante.
+
+        **Paramètres** :
+          - `id` : L'identifiant de l'attaque à mettre à jour.
+
+        **Préconditions** :
+          - L'attaque doit exister.
+          - Les champs `serveur` et `exploit` doivent être valides et renseignés.
+
+        **Corps de la requête** :
+          - `serveur` : Le nouveau serveur pour l'attaque.
+          - `exploit` : Le nouvel exploit à associer à l'attaque.
+
+        **Erreurs possibles** :
+          - `400 Bad Request` : Si les données fournies pour la mise à jour ne sont pas valides.
+          - `404 Not Found` : Si aucune attaque avec cet identifiant n'est trouvée.
+      requestBody:
+        description: Données de l'attaque à mettre à jour.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                server:
+                  type: string
+                  description: Le serveur associé à l'attaque
+                exploit:
+                  type: integer
+                  description: L'exploit utilisé pour l'attaque
+              required:
+                - server
+                - exploit
+      responses:
+        '200':
+          description: Attaque mise à jour avec succès
+        '400':
+          description: Données invalides fournies pour la mise à jour
+        '404':
+          description: Aucune attaque trouvée pour cet ID
+
+  /attacks/status/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identifiant de l'attaque
+        schema:
+          type: integer
+
+    patch:
+      summary: Mettre à jour le statut de l'attaque
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur
+      description: |
+        Permet de suivre le statut de l'attaque. Une fois tous les éléments (cible, serveur, exploit) renseignés, 
+        l'attaque peut être lancée et son statut peut évoluer.
+
+        **Statuts disponibles** :
+          - `prévue`
+          - `en cours`
+          - `réussie`
+          - `ratée`
+
+      requestBody:
+        description: Mise à jour du statut de l'attaque
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: Statut de l'attaque
+                  enum:
+                    - planned
+                    - in progress
+                    - successful
+                    - failed
+              required:
+                - status
+      responses:
+        '200':
+          description: Statut de l'attaque mis à jour avec succès
+        '400':
+          description: Données invalides fournies
+        '404':
+          description: Aucune attaque trouvée pour cet identifiant
+
+  /attacks/notes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identifiant de l'attaque
+        schema:
+          type: integer
+    patch:
+      summary: Mettre à jour les notes d'une attaque
+      security:
+        - jwt:
+            - Connecté en tant qu'utilisateur
+      description: |
+        Permet de modifier ou d'ajouter des notes à une attaque existante. Les utilisateurs peuvent 
+        mettre à jour ce champ à tout moment pour enregistrer des informations importantes sur l'attaque.
+      requestBody:
+        description: Notes à ajouter ou mettre à jour pour l'attaque
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+                  description: Notes associées à l'attaque
+      responses:
+        '200':
+          description: Notes mises à jour avec succès
+        '400':
+          description: Données invalides fournies
+        '404':
+          description: Aucune attaque trouvée pour cet identifiant
 
 components:
   schemas:
@@ -294,7 +879,7 @@ components:
         un type de serveur, un guide pas à pas pour réaliser l'attaque et un état de validation.
       type: object
       properties:
-        exploit_id:
+        exploitId:
           type: integer
           description: Identifiant unique de l'exploit
         name:
@@ -306,7 +891,7 @@ components:
         author:
           type: string
           description: Auteur de l'exploit, personne ayant découvert la vulnérabilité
-        server_type:
+        serverType:
           type: string
           description: Type de serveur vulnérable à l'exploit
         guide:
@@ -320,34 +905,47 @@ components:
         - name
         - description
         - author
-        - server_type
+        - serverType
         - guide
       example:
-        exploit_id: 1
-        name: "Buffer Overflow Attack"
-        description: "Exploit visant une vulnérabilité de débordement de mémoire tampon sur les serveurs."
-        author: "Nicolas Jackson"
-        server_type: "Linux"
-        guide: "1) Identifier la taille du tampon. 2) Injecter un code malveillant. 3) Exécuter le payload."
-        validated: false
+        exploitId: 1
+        name: "SQL Injection"
+        description: "Exploit permettant d'exploiter une faille de type injection SQL"
+        author: "hacker01"
+        serverType: "Database"
+        guide: "1) Entrer la requête SQL malveillante..."
+        validated: true
 
     target:
+      description: |
+        Une cible représente une entreprise ou une organisation visée pour une potentielle attaque.
+        Elle contient des informations telles que le nom de l'entreprise, le domaine, la localisation,
+        le nombre d'employés, le nombre de serveurs et le chiffre d'affaires.
       type: object
       properties:
+        id:
+          type: integer
+          description: Identifiant unique de la cible
         companyName:
           type: string
+          description: Nom de l'entreprise
         domain:
           type: string
-        localisation:
+          description: Nom de domaine de la cible
+        location:
           type: string
-        nbEmploys:
+          description: Localisation de la cible
+        nbEmployees:
           type: integer
+          description: Nombre d'employés de la cible
+        nbServers:
+          type: integer
+          description: Nombre de serveurs de la cible
         revenue:
           type: integer
-      required:
-        - companyName
-        - domain
+          description: Chiffre d'affaires de la cible
       example:
+        id: 1
         companyName: "Cible1"
         domain: "Finance"
         localisation: "Paris"
@@ -356,6 +954,10 @@ components:
         revenue: 50000000
 
     server:
+      description: |
+        Un serveur est une machine associée à une cible sur laquelle une attaque peut être réalisée.
+        Il est associé à une cible et contient des informations telles que l'adresse IP, 
+        l'entreprise hébergeante, le type de serveur, la technologie utilisée et le statut de validation.
       type: object
       properties:
         ip:
@@ -385,6 +987,10 @@ components:
         valid: true
 
     attack:
+      description: |
+        Une attaque est une opération malveillante visant à exploiter une cible à l'aide d'un exploit
+        et d'un serveur. Elle est associée à une cible, un serveur, un exploit, un statut (prévu, en cours,
+        réussi, raté) et des notes.
       type: object
       properties:
         target:
@@ -417,6 +1023,10 @@ components:
         notes: "Première attaque"
 
     credentials:
+      description: |
+        Objet contenant les informations d'identification de l'utilisateur. Utilisé pour la 
+        connexion, la création et la mise à jour des identifiants. Elles incluent 
+        le nom d'utilisateur unique et le mot de passe.
       type: object
       properties:
         username:
@@ -431,6 +1041,11 @@ components:
         password: "password123"
 
     user:
+      description: |
+        Un utilisateur est une personne enregistrée dans le système. Il peut être un administrateur
+        ou un utilisateur standard. Les informations de l'utilisateur incluent le nom d'utilisateur,
+        le prénom, le nom de famille et le rôle permettant de savoir s'il est un utilisateur standard
+        ou un utilisateur administrateur.
       type: object
       properties:
         username:
@@ -452,6 +1067,13 @@ components:
         isAdmin: false
 
     userWithCredentials:
+      description: |
+        Un utilisateur avec ses informations d'identification est une personne enregistrée comprenant 
+        à la fois les informations personnelles et les informations d'authentification pour 
+        la création de comptes ou la mise à jour des utilisateurs.
+        Il peut être un administrateur ou un utilisateur standard. Les informations de l'utilisateur incluent
+        le nom d'utilisateur, le prénom, le nom de famille, le rôle permettant de savoir s'il est un utilisateur
+        standard ou un utilisateur administrateur, et le mot de passe.
       type: object
       properties:
         username:
