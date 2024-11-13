@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Vinci Cyber Intelligence Cible service
+  title: Vinci Cyber Intelligence Target service
   description: |
     Microservice de gestion des cibles. Ce service permet aux hackers d'enregistrer des cibles potentielles pour leurs attaques. 
     Chaque cible doit être décrite avec précision, incluant le nom de l’entreprise, son nom de domaine, sa localisation, son nombre d’employés, 
@@ -16,21 +16,21 @@ servers:
     description: Development server
 paths:
 
-  /cibles:
+  /targets:
     get:
       summary: Lire toutes les cibles
       description: |
         Cette opération permet de récupérer la liste de toutes les cibles enregistrées dans le système. 
         Les utilisateurs peuvent filtrer les résultats en fonction du nombre minimal de serveurs ou d'un chiffre d'affaires minimal.
       parameters:
-        - name: nbServeurs
+        - name: nbServers
           in: query
           description: Nombre minimal de serveurs
           required: false
           schema:
             type: integer
             example: 10
-        - name: ca_min
+        - name: revenue
           in: query
           description: Chiffre d'affaires minimal
           required: false
@@ -45,7 +45,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/cible'
+                  $ref: '#/components/schemas/target'
 
     post:
       summary: Créer une nouvelle cible
@@ -58,14 +58,14 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/cible'
+              $ref: '#/components/schemas/target'
       responses:
         201:
           description: La cible a été créée
         401:
           description: L'utilisateur n'est pas un administrateur
 
-  /cibles/{id}:
+  /targets/{id}:
     parameters:
       - name: id
         in: path
@@ -88,7 +88,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/cible'
+                $ref: '#/components/schemas/target'
 
     delete:
       summary: Supprimer une cible
@@ -112,7 +112,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/cible'
+              $ref: '#/components/schemas/target'
       responses:
         404:
           description: Aucune cible n'a été trouvée pour cet ID
@@ -121,14 +121,14 @@ paths:
         200:
           description: La cible a été modifiée
 
-  /cibles/colocated:
+  /targets/colocated:
     get:
       summary: Trouver des cibles co-localisées
       description: |
         Cette opération permet de trouver des cibles qui sont co-localisées avec une entreprise déjà compromise. 
         Les utilisateurs doivent fournir le nom de l'entreprise déjà compromise pour obtenir la liste des cibles co-localisées.
       parameters:
-        - name: nomEntreprise
+        - name: companyName
           in: query
           description: Nom de l'entreprise déjà compromise
           required: true
@@ -143,39 +143,43 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/cible'
+                  $ref: '#/components/schemas/target'
 
 components:
   schemas:
-    cible:
+    target:
+      description: |
+        Une cible représente une entreprise ou une organisation visée pour une potentielle attaque.
+        Elle contient des informations telles que le nom de l'entreprise, le domaine, la localisation,
+        le nombre d'employés, le nombre de serveurs et le chiffre d'affaires.
       type: object
       properties:
         id:
           type: integer
           description: Identifiant unique de la cible
-        nomEntreprise:
+        companyName:
           type: string
           description: Nom de l'entreprise
         domain:
           type: string
           description: Nom de domaine de la cible
-        localisation:
+        location:
           type: string
           description: Localisation de la cible
         nbEmployees:
           type: integer
           description: Nombre d'employés de la cible
-        nbServeurs:
+        nbServers:
           type: integer
           description: Nombre de serveurs de la cible
-        chiffreAffaires:
+        revenue:
           type: integer
           description: Chiffre d'affaires de la cible
       example:
         id: 1
-        nomEntreprise: My Company
-        domain: mycompany.com
-        localisation: Bruxelles
+        companyName: "My Company"
+        domain: "mycompany.com"
+        location: "Bruxelles"
         nbEmployees: 100
-        nbServeurs: 15
-        chiffreAffaires: 210000
+        nbServers: 15
+        revenue: 210000

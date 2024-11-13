@@ -26,7 +26,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/Credentials'
+              $ref: '#/components/schemas/credentials'
       responses:
         400:
           description: Les identifiants fournis ne respectent pas le format requis
@@ -88,7 +88,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/Credentials'
+              $ref: '#/components/schemas/credentials'
       responses:
         400:
           description: Les identifiants fournis sont invalides
@@ -109,7 +109,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/Credentials'
+              $ref: '#/components/schemas/credentials'
       responses:
         400:
           description: Les informations de connexion fournies sont invalides
@@ -132,7 +132,7 @@ paths:
 
 components:
   schemas:
-    Credentials:
+    credentials:
       description: |
         Objet contenant les informations d'identification de l'utilisateur. Utilisé pour la 
         connexion, la création et la mise à jour des identifiants.
@@ -145,5 +145,5 @@ components:
           type: string
           description: Mot de passe de l'utilisateur, requis pour la connexion et sécurisé
       example:
-        username: hacker01
-        password: securePassword123
+        username: "hacker01"
+        password: "securePassword123"
