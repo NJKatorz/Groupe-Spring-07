@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @FeignClient(name = "attacks")
-public class AttacksProxy {
+public interface AttacksProxy {
 
 }
