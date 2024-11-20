@@ -1,5 +1,40 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=IntelliJ IDEA
+@baseUrl = http://localhost:8080
 
-###
+### Read all targets
+GET {{baseUrl}}/targets
+
+### Create a target
+POST {{baseUrl}}/targets
+Content-Type: application/json
+
+{
+  "companyName": "TestCompany",
+  "domain": "Clochard.be",
+  "location": "Paris, France",
+  "employees": 300,
+  "servers": 20,
+  "revenue": 200000.05
+}
+
+### Get one target by its id
+GET {{baseUrl}}/targets/1
+
+### Update a target
+PUT {{baseUrl}}/targets/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "companyName": "CyberCorp",
+  "domain": "cybercorp.com",
+  "location": "Madrid, Espagne",
+  "employees": 100,
+  "servers": 10,
+  "revenue": 1000000.0
+}
+
+### Delete a target
+DELETE {{baseUrl}}/targets/1
+
+### Read all colocated targets
+GET {{baseUrl}}/targets/colocated

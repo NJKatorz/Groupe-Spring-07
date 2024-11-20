@@ -10,9 +10,8 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class Target {
-  private int targetId;
+  private int id;
   private String companyName;
-  private String description;
   private String domain;
   private String location;
   private int employees;
