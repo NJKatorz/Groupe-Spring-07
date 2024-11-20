@@ -16,6 +16,6 @@ public class Target {
   private String domain;
   private String location;
   private int employees;
-  private String servers;
-  private String revenue;
+  private int servers;
+  private double revenue;
 }
