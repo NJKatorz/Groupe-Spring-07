@@ -1,10 +1,12 @@
 package be.vinci.ipl.projet2024.group07.gateway;
 
+import be.vinci.ipl.projet2024.group07.gateway.models.Server;
 import be.vinci.ipl.projet2024.group07.gateway.models.Target;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -53,4 +55,43 @@ public class GatewayController {
   public Iterable<Target> readAllColocatedTargets(){
     return service.readAllTargets();
   }
+
+  @PostMapping("servers")
+  public ResponseEntity<Void> createServer(@RequestBody Server server){
+    service.createServer(server);
+    return new ResponseEntity<>(HttpStatus.CREATED);
+  }
+
+  @GetMapping("servers/{serverId}")
+  public Server readServer(@PathVariable int serverId){
+    return service.readServer(serverId);
+  }
+
+  @PutMapping("servers/{serverId}")
+  public void updateServer(@PathVariable int serverId, @RequestBody Server server) {
+    if (serverId != server.getServerId())
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Server id mismatch");
+    service.updateServer(serverId, server);
+  }
+
+  @DeleteMapping("servers/{serverId}")
+  public void deleteServer(@PathVariable int serverId) {
+    service.deleteServer(serverId);
+  }
+
+  @PatchMapping("/servers/{serverId}/validate")
+  public void validateServer(@PathVariable int serverId) {
+      service.validateServer(serverId);
+  }
+
+  @GetMapping("servers/target/{targetId}")
+  public Iterable<Server> readAllServersByTarget(@PathVariable int targetId){
+    return service.readAllServersByTarget(targetId);
+  }
+
+  @DeleteMapping("servers/target/{targetId}")
+  public void deleteServersByTarget(@PathVariable int targetId) {
+    service.deleteAllServersByTarget(targetId);
+  }
+
 }

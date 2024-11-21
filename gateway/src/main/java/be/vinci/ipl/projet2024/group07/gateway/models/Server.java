@@ -13,11 +13,11 @@ public class Server {
   private int serverId;
   private String ipAdress;
   private int targetId;
-  private ServerType serverType;
+  private String serverType;
   private String technology;
   private boolean validated;
 
-  private enum ServerType {
-    WEB, DATABASE, BACKUP, MAIL, WORKSTATION;
-  }
+//  private enum ServerType {
+//    WEB, DATABASE, BACKUP, MAIL, WORKSTATION;
+//  }
 }
