@@ -38,3 +38,45 @@ DELETE {{baseUrl}}/targets/1
 
 ### Read all colocated targets
 GET {{baseUrl}}/targets/colocated
+
+### Create a server
+POST {{baseUrl}}/servers
+Content-Type: application/json
+
+{
+  "ipAddress": "192.168.1.25",
+  "targetId": 56217,
+  "serverType": "Web",
+  "technology": "Apache",
+  "validated": false
+}
+
+### Read one server by its id
+GET {{baseUrl}}/servers/1
+
+### Update a server
+PUT {{baseUrl}}/servers/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "ipAddress": "192.168.1.30",
+  "targetId": 55521,
+  "serverType": "Web",
+  "technology": "Apache",
+  "validated": false
+}
+
+### Delete a server
+DELETE {{baseUrl}}/servers/1
+
+### Validate a server
+PATCH {{baseUrl}}/servers/1/validate
+
+### Read all servers by the id 900 300
+GET {{baseUrl}}/servers/target/1
+
+### Delete all servers by the id
+DELETE {{baseUrl}}/servers/target/1
+
+

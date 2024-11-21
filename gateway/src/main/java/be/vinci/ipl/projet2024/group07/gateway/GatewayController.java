@@ -69,7 +69,7 @@ public class GatewayController {
 
   @PutMapping("servers/{serverId}")
   public void updateServer(@PathVariable int serverId, @RequestBody Server server) {
-    if (serverId != server.getServerId())
+    if (serverId != server.getId())
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Server id mismatch");
     service.updateServer(serverId, server);
   }
