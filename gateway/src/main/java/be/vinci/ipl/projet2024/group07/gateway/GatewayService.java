@@ -1,15 +1,21 @@
 package be.vinci.ipl.projet2024.group07.gateway;
 
 
+import be.vinci.ipl.projet2024.group07.gateway.data.AuthenticationProxy;
 import be.vinci.ipl.projet2024.group07.gateway.data.ExploitsProxy;
 import be.vinci.ipl.projet2024.group07.gateway.data.ServersProxy;
 import be.vinci.ipl.projet2024.group07.gateway.data.TargetsProxy;
+import be.vinci.ipl.projet2024.group07.gateway.data.UsersProxy;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.BadRequestException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.ConflictException;
+import be.vinci.ipl.projet2024.group07.gateway.exceptions.ForbiddenException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.NotFoundException;
+import be.vinci.ipl.projet2024.group07.gateway.exceptions.UnauthorizedException;
+import be.vinci.ipl.projet2024.group07.gateway.models.Credentials;
 import be.vinci.ipl.projet2024.group07.gateway.models.Exploit;
 import be.vinci.ipl.projet2024.group07.gateway.models.Server;
 import be.vinci.ipl.projet2024.group07.gateway.models.Target;
+import be.vinci.ipl.projet2024.group07.gateway.models.User;
 import feign.FeignException;
 import org.springframework.stereotype.Service;
 
@@ -17,39 +23,54 @@ import org.springframework.stereotype.Service;
 @Service
 public class GatewayService {
 
+  private AuthenticationProxy authenticationProxy;
   private ExploitsProxy exploitsProxy;
   private ServersProxy serversProxy;
   private TargetsProxy targetsProxy;
+  private UsersProxy usersProxy;
 
-
-  public GatewayService(ExploitsProxy exploitsProxy, ServersProxy serversProxy,
-      TargetsProxy targetsProxy) {
+  public GatewayService(AuthenticationProxy authenticationProxy, ExploitsProxy exploitsProxy, ServersProxy serversProxy,
+      TargetsProxy targetsProxy, UsersProxy usersProxy) {
+    this.authenticationProxy = authenticationProxy;
     this.exploitsProxy = exploitsProxy;
     this.serversProxy = serversProxy;
     this.targetsProxy = targetsProxy;
+    this.usersProxy = usersProxy;
   }
 
-  public Iterable<Exploit> readAllExploits(String serverType) {
-    return exploitsProxy.readAll(serverType);
-  }
-
-  public void createExploit(Exploit exploit) throws BadRequestException, ConflictException {
+  public String connect(Credentials credentials) throws BadRequestException, UnauthorizedException {
     try {
-      exploitsProxy.createOne(exploit);
+      return authenticationProxy.connect(credentials);
     } catch (FeignException e) {
-      if (e.status() == 409) {
-        throw new ConflictException();
-      } else if (e.status() == 400) {
+      if (e.status() == 400) {
         throw new BadRequestException();
+      } else if (e.status() == 401) {
+        throw new UnauthorizedException();
       } else {
         throw e;
       }
     }
   }
 
-  public Exploit readOneExploit(int exploitId) throws NotFoundException {
+  public void verify(String token, String expectedUserEmail)
+      throws ForbiddenException, UnauthorizedException {
     try {
-      return exploitsProxy.readOne(exploitId);
+      String userEmail = authenticationProxy.verify(token);
+      if (!userEmail.equals(expectedUserEmail)) {
+        throw new ForbiddenException();
+      }
+    } catch (FeignException e) {
+      if (e.status() == 401) {
+        throw new UnauthorizedException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public User readOneUserByEmail(String email) throws NotFoundException {
+    try {
+      return usersProxy.readOneByEmail(email);
     } catch (FeignException e) {
       if (e.status() == 404) {
         throw new NotFoundException();
@@ -59,10 +80,47 @@ public class GatewayService {
     }
   }
 
-  public void updateExploit(int exploitId, Exploit exploit)
-      throws BadRequestException, NotFoundException {
+  public void createUser(Credentials userWithCredentials) throws BadRequestException, ConflictException{
     try {
-      exploitsProxy.updateOne(exploitId, exploit);
+      usersProxy.createOne(userWithCredentials);
+    } catch (FeignException e) {
+      if (e.status() == 400) {
+        throw new BadRequestException();
+      } else if (e.status() == 409) {
+        throw new ConflictException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public User readOneUserById(int userId) throws NotFoundException {
+    try {
+      return usersProxy.readOneByUserId(userId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void deleteUser(int userId) throws NotFoundException {
+      try {
+        usersProxy.deleteOne(userId);
+      } catch (FeignException e) {
+        if (e.status() == 404) {
+          throw new NotFoundException();
+        } else{
+          throw e;
+        }
+      }
+  }
+
+  public void updateUserName(int userId, String name) throws BadRequestException, NotFoundException {
+    try {
+      usersProxy.updateName(userId, name);
     } catch (FeignException e) {
       if (e.status() == 400) {
         throw new BadRequestException();
@@ -74,9 +132,37 @@ public class GatewayService {
     }
   }
 
-  public void deleteExploit(int exploitId) throws NotFoundException {
+  public void updateUserRole(int userId, String role) throws BadRequestException, NotFoundException {
     try {
-      exploitsProxy.deleteOne(exploitId);
+      usersProxy.updateRole(userId, role);
+    } catch (FeignException e) {
+      if (e.status() == 400) {
+        throw new BadRequestException();
+      } else if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void updateUserPassword(int userId, Credentials userWithCredentials) throws BadRequestException, NotFoundException {
+    try {
+      usersProxy.updatePassword(userId, userWithCredentials);
+    } catch (FeignException e) {
+      if (e.status() == 400) {
+        throw new BadRequestException();
+      } else if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  Iterable<Exploit> realAllUserExploits(int userId) throws NotFoundException {
+    try {
+      return usersProxy.readAllUserExploits(userId);
     } catch (FeignException e) {
       if (e.status() == 404) {
         throw new NotFoundException();
@@ -86,18 +172,9 @@ public class GatewayService {
     }
   }
 
-  public void validateExploit(int exploitId) throws NotFoundException {
-    try {
-      exploitsProxy.validateExploit(exploitId);
-    } catch (FeignException e) {
-      if (e.status() == 404) {
-        throw new NotFoundException();
-      } else {
-        throw e;
-      }
-    }
+  public Iterable<Exploit> readAllExploits(String serverType) {
+    return exploitsProxy.readAll(serverType);
   }
-
 
   public Iterable<Target> readAllTargets() {
     return targetsProxy.readAll();
@@ -224,6 +301,72 @@ public class GatewayService {
       }
     }
   }
+
+  public void createExploit(Exploit exploit) throws BadRequestException, ConflictException {
+    try {
+      exploitsProxy.createOne(exploit);
+    } catch (FeignException e) {
+      if (e.status() == 409) {
+        throw new ConflictException();
+      } else if (e.status() == 400) {
+        throw new BadRequestException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public Exploit readOneExploit(int exploitId) throws NotFoundException {
+    try {
+      return exploitsProxy.readOne(exploitId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void updateExploit(int exploitId, Exploit exploit)
+      throws BadRequestException, NotFoundException {
+    try {
+      exploitsProxy.updateOne(exploitId, exploit);
+    } catch (FeignException e) {
+      if (e.status() == 400) {
+        throw new BadRequestException();
+      } else if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void deleteExploit(int exploitId) throws NotFoundException {
+    try {
+      exploitsProxy.deleteOne(exploitId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void validateExploit(int exploitId) throws NotFoundException {
+    try {
+      exploitsProxy.validateExploit(exploitId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
 
 }
 

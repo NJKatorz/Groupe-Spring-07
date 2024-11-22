@@ -10,12 +10,12 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class User {
-  private int userId;
+  private int id;
   private String name;
   private String email;
-  private Role role;
+  private String role;
 
-  private enum Role {
-    ADMIN, USER;
-  }
+//  private enum Role {
+//    ADMIN, USER;
+//  }
 }
