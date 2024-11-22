@@ -1,11 +1,13 @@
 package be.vinci.ipl.projet2024.group07.gateway;
 
 
+import be.vinci.ipl.projet2024.group07.gateway.data.ExploitsProxy;
 import be.vinci.ipl.projet2024.group07.gateway.data.ServersProxy;
 import be.vinci.ipl.projet2024.group07.gateway.data.TargetsProxy;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.BadRequestException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.ConflictException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.NotFoundException;
+import be.vinci.ipl.projet2024.group07.gateway.models.Exploit;
 import be.vinci.ipl.projet2024.group07.gateway.models.Server;
 import be.vinci.ipl.projet2024.group07.gateway.models.Target;
 import feign.FeignException;
@@ -15,13 +17,85 @@ import org.springframework.stereotype.Service;
 @Service
 public class GatewayService {
 
+  private ExploitsProxy exploitsProxy;
   private ServersProxy serversProxy;
   private TargetsProxy targetsProxy;
 
 
-  public GatewayService(ServersProxy serversProxy, TargetsProxy targetsProxy) {
+  public GatewayService(ExploitsProxy exploitsProxy, ServersProxy serversProxy,
+      TargetsProxy targetsProxy) {
+    this.exploitsProxy = exploitsProxy;
     this.serversProxy = serversProxy;
     this.targetsProxy = targetsProxy;
+  }
+
+  public Iterable<Exploit> readAllExploits(String serverType) {
+    return exploitsProxy.readAll(serverType);
+  }
+
+  public void createExploit(Exploit exploit) throws BadRequestException, ConflictException {
+    try {
+      exploitsProxy.createOne(exploit);
+    } catch (FeignException e) {
+      if (e.status() == 409) {
+        throw new ConflictException();
+      } else if (e.status() == 400) {
+        throw new BadRequestException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public Exploit readOneExploit(int exploitId) throws NotFoundException {
+    try {
+      return exploitsProxy.readOne(exploitId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void updateExploit(int exploitId, Exploit exploit)
+      throws BadRequestException, NotFoundException {
+    try {
+      exploitsProxy.updateOne(exploitId, exploit);
+    } catch (FeignException e) {
+      if (e.status() == 400) {
+        throw new BadRequestException();
+      } else if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void deleteExploit(int exploitId) throws NotFoundException {
+    try {
+      exploitsProxy.deleteOne(exploitId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void validateExploit(int exploitId) throws NotFoundException {
+    try {
+      exploitsProxy.validateExploit(exploitId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
   }
 
 
@@ -43,7 +117,7 @@ public class GatewayService {
     }
   }
 
-  public Target readTarget(int targetId) throws NotFoundException {
+  public Target readOneTarget(int targetId) throws NotFoundException {
     try {
       return targetsProxy.readOne(targetId);
     } catch (FeignException e) {
@@ -100,7 +174,7 @@ public class GatewayService {
     }
   }
 
-  public Server readServer(int serverId) throws NotFoundException {
+  public Server readOneServer(int serverId) throws NotFoundException {
     try {
       return serversProxy.readOne(serverId);
     } catch (FeignException e) {
