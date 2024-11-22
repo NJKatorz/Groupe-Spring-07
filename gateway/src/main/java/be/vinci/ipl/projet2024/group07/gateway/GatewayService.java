@@ -151,27 +151,5 @@ public class GatewayService {
     }
   }
 
-  public Iterable<Server> readAllServersByTarget(int targetId) throws NotFoundException {
-    try {
-      return serversProxy.readByTarget(targetId);
-    } catch (FeignException e) {
-      if (e.status() == 404) {
-        throw new NotFoundException();
-      } else {
-        throw e;
-      }
-    }
-  }
-
-  public void deleteAllServersByTarget(int targetId) throws NotFoundException {
-    try {
-      serversProxy.deleteByTarget(targetId);
-    } catch (FeignException e) {
-      if (e.status() == 404) {
-        throw new NotFoundException();
-      }
-    }
-  }
-
 }
 

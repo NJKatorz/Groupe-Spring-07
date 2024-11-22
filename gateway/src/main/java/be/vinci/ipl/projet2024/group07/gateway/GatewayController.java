@@ -84,14 +84,4 @@ public class GatewayController {
       service.validateServer(serverId);
   }
 
-  @GetMapping("servers/target/{targetId}")
-  public Iterable<Server> readAllServersByTarget(@PathVariable int targetId){
-    return service.readAllServersByTarget(targetId);
-  }
-
-  @DeleteMapping("servers/target/{targetId}")
-  public void deleteServersByTarget(@PathVariable int targetId) {
-    service.deleteAllServersByTarget(targetId);
-  }
-
 }

@@ -72,11 +72,3 @@ DELETE {{baseUrl}}/servers/1
 
 ### Validate a server
 PATCH {{baseUrl}}/servers/1/validate
-
-### Read all servers by the id 900 300
-GET {{baseUrl}}/servers/target/1
-
-### Delete all servers by the id
-DELETE {{baseUrl}}/servers/target/1
-
-

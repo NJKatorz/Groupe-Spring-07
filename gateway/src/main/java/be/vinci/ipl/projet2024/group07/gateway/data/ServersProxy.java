@@ -30,10 +30,4 @@ public interface ServersProxy {
   @PatchMapping("/servers/{serverId}/validate")
   void validateServer(@PathVariable int serverId);
 
-  @GetMapping("servers/target/{targetId}")
-  Iterable<Server> readByTarget(@PathVariable int targetId);
-
-  @DeleteMapping("servers/target/{targetId}")
-  void deleteByTarget(@PathVariable int targetId);
-
 }
