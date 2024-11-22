@@ -1,5 +1,6 @@
 package be.vinci.ipl.projet2024.group07.gateway;
 
+import be.vinci.ipl.projet2024.group07.gateway.models.Attack;
 import be.vinci.ipl.projet2024.group07.gateway.models.Credentials;
 import be.vinci.ipl.projet2024.group07.gateway.models.Exploit;
 import be.vinci.ipl.projet2024.group07.gateway.models.Server;
@@ -173,4 +174,49 @@ public class GatewayController {
     service.validateExploit(exploitId);
   }
 
+  @GetMapping("/attacks")
+  public Iterable<Attack> readAllAttacks(){
+    return service.readAllAttacks();
+  }
+
+  @PostMapping("/attacks")
+  public ResponseEntity<Void> createAttack(@RequestBody Attack attack){
+    service.createAttack(attack);
+    return new ResponseEntity<>(HttpStatus.CREATED);
+  }
+
+  @GetMapping("/attacks/{attackId}")
+  public Attack readOneAttack(@PathVariable int attackId){
+    return service.readOneAttack(attackId);
+  }
+
+  @DeleteMapping("/attacks/{attackId}")
+  public void deleteAttack(@PathVariable int attackId){
+    service.deleteAttack(attackId);
+  }
+
+  @PatchMapping("/attacks/{attackId}/notes")
+  public void updateNotesAttack(@PathVariable int attackId, @RequestBody String notes){
+    service.updateNotesAttack(attackId, notes);
+  }
+
+  @PatchMapping("/attacks/{attackId}/server")
+  public void addServerToAttack(@PathVariable int attackId, @RequestBody int serverId){
+    service.addServerToAttack(attackId, serverId);
+  }
+
+  @PatchMapping("/attacks/{attackId}/exploit")
+  public void addExploitToAttack(@PathVariable int attackId, @RequestBody int exploitId){
+    service.addExploitToAttack(attackId, exploitId);
+  }
+
+  @PostMapping("/attacks/{attackId}/launch")
+  public void launchAttack(@PathVariable int attackId){
+    service.lauchAttack(attackId);
+  }
+
+  @PostMapping("/attacks/{attackId}/result")
+  public void saveAttackResult(@PathVariable int attackId, @RequestBody String result){
+    service.saveAttackResult(attackId, result);
+  }
 }
