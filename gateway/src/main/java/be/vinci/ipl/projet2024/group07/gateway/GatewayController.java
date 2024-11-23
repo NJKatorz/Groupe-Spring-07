@@ -78,8 +78,9 @@ public class GatewayController {
   }
 
   @GetMapping("/targets")
-  public Iterable<Target> readAllTargets(){
-    return service.readAllTargets();
+  public Iterable<Target> readAllTargets(@RequestParam(value = "minServers", required = false) int minServers,
+      @RequestParam(value = "minRevenue", required = false) int minRevenue){
+    return service.readAllTargets(minServers, minRevenue);
   }
 
   @PostMapping("/targets")
@@ -104,6 +105,11 @@ public class GatewayController {
   @DeleteMapping("/targets/{targetId}")
   public void deleteTarget(@PathVariable int targetId) {
     service.deleteTarget(targetId);
+  }
+
+  @GetMapping("/targets/{targetId}/servers")
+  public Iterable<Server> readAllServersByTargetId(@PathVariable int targetId){
+    return service.readAllServersByTargetId(targetId);
   }
 
   @GetMapping("/targets/colocated")

@@ -30,4 +30,6 @@ public interface ServersProxy {
   @PatchMapping("/servers/{serverId}/validate")
   void validateServer(@PathVariable int serverId);
 
+  @GetMapping("/servers/target/{targetId}")
+  Iterable<Server> readAllServersByTargetId(@PathVariable int targetId);
 }

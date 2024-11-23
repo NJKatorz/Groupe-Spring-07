@@ -20,6 +20,7 @@ import be.vinci.ipl.projet2024.group07.gateway.models.Target;
 import be.vinci.ipl.projet2024.group07.gateway.models.User;
 import feign.FeignException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 
 @Service
@@ -185,8 +186,8 @@ public class GatewayService {
     return exploitsProxy.readAll(serverType);
   }
 
-  public Iterable<Target> readAllTargets() {
-    return targetsProxy.readAll();
+  public Iterable<Target> readAllTargets(int minServers, int minRevenue) {
+    return targetsProxy.readAll(minServers, minRevenue);
   }
 
   public void createTarget(Target target) throws BadRequestException, ConflictException {
@@ -243,7 +244,7 @@ public class GatewayService {
   }
 
   public Iterable<Target> readColocated() {
-    return targetsProxy.readAll();
+    return targetsProxy.readColocated();
   }
 
   public void createServer(Server server) throws BadRequestException, ConflictException {
@@ -302,6 +303,19 @@ public class GatewayService {
   public void validateServer(int serverId) throws NotFoundException {
     try {
       serversProxy.validateServer(serverId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public Iterable<Server> readAllServersByTargetId(@PathVariable int targetId)
+      throws NotFoundException {
+    try {
+      return serversProxy.readAllServersByTargetId(targetId);
     } catch (FeignException e) {
       if (e.status() == 404) {
         throw new NotFoundException();
@@ -448,7 +462,8 @@ public class GatewayService {
     }
   }
 
-  public void addExploitToAttack(int attackId, int exploitId) throws NotFoundException, BadRequestException {
+  public void addExploitToAttack(int attackId, int exploitId)
+      throws NotFoundException, BadRequestException {
     try {
       attacksProxy.addExploitToAttack(attackId, exploitId);
     } catch (FeignException e) {
@@ -462,19 +477,20 @@ public class GatewayService {
     }
   }
 
-  public void lauchAttack(int attackId) throws NotFoundException{
+  public void lauchAttack(int attackId) throws NotFoundException {
     try {
       attacksProxy.lauchAttack(attackId);
     } catch (FeignException e) {
       if (e.status() == 404) {
         throw new NotFoundException();
-      } else{
+      } else {
         throw e;
       }
     }
   }
 
-  public void saveAttackResult(int attackId, String result) throws NotFoundException, BadRequestException {
+  public void saveAttackResult(int attackId, String result)
+      throws NotFoundException, BadRequestException {
     try {
       attacksProxy.saveAttackResult(attackId, result);
     } catch (FeignException e) {

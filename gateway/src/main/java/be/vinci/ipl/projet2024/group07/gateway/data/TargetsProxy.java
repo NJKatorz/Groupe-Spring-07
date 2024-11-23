@@ -9,13 +9,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Repository
 @FeignClient(name = "targets")
 public interface TargetsProxy {
 
   @GetMapping("/targets")
-  Iterable<Target> readAll();
+  Iterable<Target> readAll(@RequestParam(value = "minServers", required = false) int minServers,
+      @RequestParam(value = "minRevenue", required = false) int minRevenue);
 
   @PostMapping("/targets")
   void createOne(@RequestBody Target target);
