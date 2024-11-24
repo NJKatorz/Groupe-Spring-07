@@ -9,7 +9,6 @@ import be.vinci.ipl.projet2024.group07.gateway.data.TargetsProxy;
 import be.vinci.ipl.projet2024.group07.gateway.data.UsersProxy;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.BadRequestException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.ConflictException;
-import be.vinci.ipl.projet2024.group07.gateway.exceptions.ForbiddenException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.NotFoundException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.UnauthorizedException;
 import be.vinci.ipl.projet2024.group07.gateway.models.Attack;
@@ -58,13 +57,10 @@ public class GatewayService {
     }
   }
 
-  public void verify(String token, String expectedUserEmail)
-      throws ForbiddenException, UnauthorizedException {
+  public String verify(String token)
+      throws UnauthorizedException {
     try {
-      String userEmail = authenticationProxy.verify(token);
-      if (!userEmail.equals(expectedUserEmail)) {
-        throw new ForbiddenException();
-      }
+      return authenticationProxy.verify(token);
     } catch (FeignException e) {
       if (e.status() == 401) {
         throw new UnauthorizedException();
@@ -73,6 +69,7 @@ public class GatewayService {
       }
     }
   }
+
 
   public User readOneUserByEmail(String email) throws NotFoundException {
     try {

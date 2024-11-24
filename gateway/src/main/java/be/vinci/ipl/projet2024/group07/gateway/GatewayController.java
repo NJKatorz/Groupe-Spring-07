@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,7 +34,7 @@ public class GatewayController {
   }
 
   @PostMapping("/users")
-  public ResponseEntity<Void> createTarget(@RequestBody Credentials userWithCredentials){
+  public ResponseEntity<Void> createUser(@RequestBody Credentials userWithCredentials){
     service.createUser(userWithCredentials);
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
@@ -49,26 +50,27 @@ public class GatewayController {
   }
 
   @DeleteMapping("/users/{userId}")
-  public void deleteUser(@PathVariable int userId) {
+  public void deleteUser(@PathVariable int userId, @RequestHeader("Authorization") String token) {
+    service.verify(token);
     service.deleteUser(userId);
   }
 
   @PatchMapping("/users/{userId}/name")
-  public void updateUserName(@PathVariable int userId, @RequestBody String newName) {
+  public void updateUserName(@PathVariable int userId, @RequestBody String newName, @RequestHeader("Authorization") String token) {
+    service.verify(token);
     service.updateUserName(userId, newName);
   }
 
   @PatchMapping("/users/{userId}/role")
-  public void updateUserRole(@PathVariable int userId, @RequestBody String newRole) {
+  public void updateUserRole(@PathVariable int userId, @RequestBody String newRole, @RequestHeader("Authorization") String token) {
+    service.verify(token);
     service.updateUserRole(userId, newRole);
   }
 
   @PatchMapping("/users/{userId}/password")
-  public void updatePassword(@PathVariable int userId, @RequestBody Credentials userWithCredentials) {
-    User userFound = service.readOneUserById(userId);
-    if (userFound != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target id mismatch");
-    }
+  public void updatePassword(@PathVariable int userId, @RequestBody Credentials userWithCredentials,
+      @RequestHeader("Authorization") String token) {
+    service.verify(token);
     service.updateUserPassword(userId, userWithCredentials);
   }
 
@@ -84,9 +86,14 @@ public class GatewayController {
   }
 
   @PostMapping("/targets")
-  public ResponseEntity<Void> createTarget(@RequestBody Target target){
-    service.createTarget(target);
-    return new ResponseEntity<>(HttpStatus.CREATED);
+  public ResponseEntity<Void> createTarget(@RequestBody Target target, @RequestHeader("Authorization") String token){
+    String userMail = service.verify(token);
+    User user = service.readOneUserByEmail(userMail);
+    if(user.getRole().equals("admin")){
+      service.createTarget(target);
+      return new ResponseEntity<>(HttpStatus.CREATED);
+    }else
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
   }
 
   @GetMapping("/targets/{targetId}")
@@ -99,6 +106,7 @@ public class GatewayController {
     if (target.getId() != targetId){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target id mismatch");
     }
+
     service.updateTarget(targetId, target);
   }
 
