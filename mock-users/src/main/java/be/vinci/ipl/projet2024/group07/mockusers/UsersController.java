@@ -12,25 +12,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class UsersController {
-  @PostMapping("/users/{pseudo}")
-  public ResponseEntity<Void> createOne(@PathVariable String pseudo, @RequestBody UserWithCredentials user) {
+  @PostMapping("/{username}")
+  public ResponseEntity<Void> createOne(@PathVariable String username, @RequestBody UserWithCredentials user) {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @GetMapping("/users/{pseudo}")
-  public User readOne(@PathVariable String pseudo) {
+  @GetMapping("/{username}")
+  public User readOne(@PathVariable String username) {
     User user = new User();
-    user.setPseudo(pseudo);
+    user.setPseudo(username);
     user.setFirstname("test");
     user.setLastname("test");
     return user;
   }
 
-  @PutMapping("/users/{pseudo}")
-  public void updateOne(@PathVariable String pseudo, @RequestBody UserWithCredentials user) {
+  @PutMapping("/{username}")
+  public void updateOne(@PathVariable String username, @RequestBody UserWithCredentials user) {
   }
 
-  @DeleteMapping("/users/{pseudo}")
-  public void deleteOne(@PathVariable String pseudo) {
+  @DeleteMapping("/{username}")
+  public void deleteOne(@PathVariable String username) {
   }
 }
