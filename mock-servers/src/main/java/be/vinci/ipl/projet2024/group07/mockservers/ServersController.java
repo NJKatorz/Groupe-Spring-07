@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class ServersController {
 
-  @GetMapping("servers/{serverId}")
+  @GetMapping("/servers/{serverId}")
   public ResponseEntity<Server> readOne(@PathVariable int serverId) {
     Server server = new Server();
     server.setId(serverId);
@@ -23,17 +23,17 @@ public class ServersController {
     return new ResponseEntity<>(server, HttpStatus.OK);
   }
 
-  @PostMapping("servers")
+  @PostMapping("/servers")
   public ResponseEntity<Server> createOne(@RequestBody Server newServer) {
     return new ResponseEntity<>(newServer, HttpStatus.CREATED);
   }
 
-  @PutMapping("servers/{serverId}")
+  @PutMapping("/servers/{serverId}")
   public ResponseEntity<Void> updateOne(@PathVariable int serverId, @RequestBody Server updatedServer) {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @DeleteMapping("servers/{serverId}")
+  @DeleteMapping("/servers/{serverId}")
   public ResponseEntity<Void> deleteOne(@PathVariable int serverId) {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
@@ -43,12 +43,12 @@ public class ServersController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @GetMapping("servers/target/{targetId}")
+  @GetMapping("/servers/target/{targetId}")
   public ResponseEntity<Iterable<Server>> readByTarget(@PathVariable int targetId) {
     return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
   }
 
-  @DeleteMapping("servers/target/{targetId}")
+  @DeleteMapping("/servers/target/{targetId}")
   public ResponseEntity<Void> deleteByTarget(@PathVariable int targetId) {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
