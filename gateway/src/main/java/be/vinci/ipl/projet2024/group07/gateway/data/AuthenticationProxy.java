@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "authentication")
 public interface AuthenticationProxy {
 
-  @PostMapping("/authentication/connect")
+  @PostMapping("/auth/login")
   String connect(@RequestBody Credentials credentials);
 
-  @PostMapping("/authentication/verify")
+  @PostMapping("/auth/verify-token")
   String verify(@RequestBody String token);
 }

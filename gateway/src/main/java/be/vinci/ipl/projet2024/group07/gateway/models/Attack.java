@@ -10,15 +10,15 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class Attack {
-  private int id;
+  private int attackId;
   private int targetId;
   private int serverId;
   private int exploitId;
-  private Status status;
+  private String status;
   private String notes;
 
-  private enum Status {
-    PENDING, IN_PROGRESS, SUCCESS, FAILED;
-  }
+//  private enum Status {
+//    PENDING, IN_PROGRESS, SUCCESS, FAILED;
+//  }
 
 }

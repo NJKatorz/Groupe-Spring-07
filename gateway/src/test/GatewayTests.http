@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ### Get one target by its id
-GET {{baseUrl}}/targets/1
+GET {{baseUrl}}/targets/5
 
 ### Update a target
 PUT {{baseUrl}}/targets/1
@@ -72,3 +72,58 @@ DELETE {{baseUrl}}/servers/1
 
 ### Validate a server
 PATCH {{baseUrl}}/servers/1/validate
+
+### Read all attacks
+GET {{baseUrl}}/attacks
+
+### Create an attack
+POST {{baseUrl}}/attacks
+Content-Type: application/json
+
+{
+  "attackId": 98765,
+  "targetId": 54321,
+  "serverId": 67890,
+  "exploitId": 12345,
+  "status": "planifiée",
+  "notes": "Nécessite une connexion VPN pour accéder au serveur cible."
+}
+
+### Read one attack
+GET {{baseUrl}}/attacks/155
+
+### Delete one attack
+DELETE {{baseUrl}}/attacks/15
+
+### Update server for an attack
+PATCH {{baseUrl}}/attacks/15/server
+Content-Type: application/json
+
+{
+  "serverId": 213214
+}
+
+### Update exploit for an attack
+PATCH {{baseUrl}}/attacks/15/exploit
+Content-Type: application/json
+
+{
+  "exploitId": 218321
+}
+
+### Update notes for an attack
+PATCH {{baseUrl}}/attacks/15/notes
+Content-Type: application/json
+
+{
+  "notes": "Entrez le mot de passe du virus"
+}
+
+### Launch an attack
+POST {{baseUrl}}/attacks/15/launch
+
+### Record an attack
+POST {{baseUrl}}/attacks/15/result
+
+
+

@@ -28,55 +28,9 @@ public class GatewayController {
     this.service = service;
   }
 
-  @GetMapping("/users")
-  public User readUserByEmail(@RequestParam(value = "email") String email) {
-    return service.readOneUserByEmail(email);
-  }
-
-  @PostMapping("/users")
-  public ResponseEntity<Void> createUser(@RequestBody Credentials userWithCredentials){
-    service.createUser(userWithCredentials);
-    return new ResponseEntity<>(HttpStatus.CREATED);
-  }
-
   @PostMapping("/login")
-  public String login(@RequestBody Credentials credentials) {
-    return service.connect(credentials);
-  }
-
-  @GetMapping("/users/{userId}")
-  public User readUserByUserId(@PathVariable int userId) {
-    return service.readOneUserById(userId);
-  }
-
-  @DeleteMapping("/users/{userId}")
-  public void deleteUser(@PathVariable int userId, @RequestHeader("Authorization") String token) {
-    service.verify(token);
-    service.deleteUser(userId);
-  }
-
-  @PatchMapping("/users/{userId}/name")
-  public void updateUserName(@PathVariable int userId, @RequestBody String newName, @RequestHeader("Authorization") String token) {
-    service.verify(token);
-    service.updateUserName(userId, newName);
-  }
-
-  @PatchMapping("/users/{userId}/role")
-  public void updateUserRole(@PathVariable int userId, @RequestBody String newRole, @RequestHeader("Authorization") String token) {
-    service.verify(token);
-    service.updateUserRole(userId, newRole);
-  }
-
-  @PatchMapping("/users/{userId}/password")
-  public void updatePassword(@PathVariable int userId, @RequestBody Credentials userWithCredentials,
-      @RequestHeader("Authorization") String token) {
-    service.verify(token);
-    service.updateUserPassword(userId, userWithCredentials);
-  }
-
-  @GetMapping("/users/{userId}/exploits")
-  public Iterable<Exploit> readAllExploitsByUserId(@PathVariable int userId) {
-    return service.realAllUserExploits(userId);
+  public ResponseEntity<String> login(@RequestBody Credentials credentials) {
+    return new ResponseEntity<>(service.connect(credentials), HttpStatus.OK);
   }
 
   @GetMapping("/targets")
@@ -86,14 +40,9 @@ public class GatewayController {
   }
 
   @PostMapping("/targets")
-  public ResponseEntity<Void> createTarget(@RequestBody Target target, @RequestHeader("Authorization") String token){
-    String userMail = service.verify(token);
-    User user = service.readOneUserByEmail(userMail);
-    if(user.getRole().equals("admin")){
+  public ResponseEntity<Void> createTarget(@RequestBody Target target){
       service.createTarget(target);
       return new ResponseEntity<>(HttpStatus.CREATED);
-    }else
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
   }
 
   @GetMapping("/targets/{targetId}")
@@ -154,39 +103,6 @@ public class GatewayController {
     service.validateServer(serverId);
   }
 
-  @GetMapping("/exploits")
-  public Iterable<Exploit> readAllExploits(@RequestParam(value = "serverType", required = false) String serverType) {
-    return service.readAllExploits(serverType);
-  }
-
-  @PostMapping("/exploits")
-  public ResponseEntity<Void> createExploit(@RequestBody Exploit exploit) {
-    service.createExploit(exploit);
-    return new ResponseEntity<>(HttpStatus.CREATED);
-  }
-
-  @GetMapping("/exploits/{exploitId}")
-  public Exploit readOneExploit(@PathVariable int exploitId) {
-    return service.readOneExploit(exploitId);
-  }
-
-  @PutMapping("/exploits/{exploitId}")
-  public void updateExploit(@PathVariable int exploitId, @RequestBody Exploit exploit) {
-    if (exploit.getId() != exploitId){
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target id mismatch");
-    }
-    service.updateExploit(exploitId, exploit);
-  }
-
-  @DeleteMapping("/exploits/{exploitId}")
-  public void deleteExploit(@PathVariable int exploitId) {
-    service.deleteExploit(exploitId);
-  }
-
-  @PatchMapping("/exploits/{exploitId}/validate")
-  public void validateExploit(@PathVariable int exploitId) {
-    service.validateExploit(exploitId);
-  }
 
   @GetMapping("/attacks")
   public Iterable<Attack> readAllAttacks(){
@@ -230,7 +146,7 @@ public class GatewayController {
   }
 
   @PostMapping("/attacks/{attackId}/result")
-  public void saveAttackResult(@PathVariable int attackId, @RequestBody String result){
-    service.saveAttackResult(attackId, result);
+  public void recordResult(@PathVariable int attackId, @RequestBody String result){
+    service.recordResult(attackId, result);
   }
 }

@@ -2,6 +2,7 @@ package be.vinci.ipl.projet2024.group07.gateway.data;
 
 import be.vinci.ipl.projet2024.group07.gateway.models.Attack;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,7 @@ public interface AttacksProxy {
   Iterable<Attack> readAll();
 
   @PostMapping("/attacks")
-  void createOne(@RequestBody Attack attack);
+  ResponseEntity<Attack> createOne(@RequestBody Attack attack);
 
   @GetMapping("/attacks/{attackId}")
   Attack readOne(@PathVariable int attackId);
@@ -36,8 +37,8 @@ public interface AttacksProxy {
   void addExploitToAttack(@PathVariable int attackId, @RequestBody int exploitId);
 
   @PostMapping("/attacks/{attackId}/launch")
-  void lauchAttack(@PathVariable int attackId);
+  void launchAttack(@PathVariable int attackId);
 
   @PostMapping("/attacks/{attackId}/result")
-  void saveAttackResult(@PathVariable int attackId, @RequestBody String result);
+  void recordResult(@PathVariable int attackId, @RequestBody String result);
 }
