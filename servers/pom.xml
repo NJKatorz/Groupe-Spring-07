@@ -6,14 +6,14 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.3.5</version>
+    <version>3.4.0</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>be.vinci.ipl.projet2024.group07</groupId>
-  <artifactId>mock-servers</artifactId>
+  <artifactId>servers</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>mock-servers</name>
-  <description>mock-servers</description>
+  <name>servers</name>
+  <description>servers</description>
   <url/>
   <licenses>
     <license/>
@@ -29,7 +29,7 @@
   </scm>
   <properties>
     <java.version>17</java.version>
-    <spring-cloud.version>2023.0.3</spring-cloud.version>
+    <spring-cloud.version>2024.0.0-RC1</spring-cloud.version>
   </properties>
   <dependencies>
     <dependency>
@@ -91,15 +91,17 @@
           </excludes>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>7</source>
-          <target>7</target>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/milestone</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 
 </project>
