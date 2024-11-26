@@ -8,24 +8,33 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class UserWithCredentials {
-  private String username;
-  private String firstname;
-  private String lastname;
+  private String name;
+  private String email;
   private String password;
 
+  /**
+   * Convertit un UserWithCredentials en User sans les credentials.
+   * @return un objet User
+   */
   public User toUser() {
-    return new User(username, firstname, lastname);
+    return new User(null, name, email, "user"); // Le rôle par défaut est "user"
   }
 
+  /**
+   * Convertit les credentials pour un service d'authentification.
+   * @return un objet Credentials
+   */
   public Credentials toCredentials() {
-    return new Credentials(username, password);
+    return new Credentials(email, password);
   }
 
+  /**
+   * Vérifie si l'objet UserWithCredentials est invalide.
+   * @return true si un champ requis est manquant ou vide
+   */
   public boolean invalid() {
-    return username == null || username.isBlank() ||
-        firstname == null || firstname.isBlank() ||
-        lastname == null || lastname.isBlank() ||
+    return name == null || name.isBlank() ||
+        email == null || email.isBlank() ||
         password == null || password.isBlank();
   }
-
 }
