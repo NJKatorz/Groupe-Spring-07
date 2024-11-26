@@ -8,18 +8,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/users")
+// @RequestMapping("/users")
 public class UsersController {
 
   private final Map<Integer, User> users = new HashMap<>();
   private int currentId = 1;
 
-  @GetMapping
+  @GetMapping("/users")
   public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
-    User user = users.values().stream()
-        .filter(u -> u.getEmail().equalsIgnoreCase(email))
-        .findFirst()
-        .orElse(null);
+//    User user = users.values().stream()
+//        .filter(u -> u.getEmail().equalsIgnoreCase(email))
+//        .findFirst()
+//        .orElse(null);
+    User user = new User();
+    user.setEmail(email);
+    user.setId(currentId);
+    user.setName("NJ");
+    user.setRole("user");
 
     if (user == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -28,7 +33,7 @@ public class UsersController {
     return ResponseEntity.ok(user);
   }
 
-  @PostMapping
+  @PostMapping("/users")
   public ResponseEntity<User> createUser(@RequestBody UserWithCredentials user) {
     User newUser = new User();
     newUser.setId(currentId++);
@@ -40,7 +45,7 @@ public class UsersController {
     return new ResponseEntity<>(newUser, HttpStatus.CREATED);
   }
 
-  @GetMapping("/{userId}")
+  @GetMapping("/users/{userId}")
   public ResponseEntity<User> getUserById(@PathVariable int userId) {
     User user = users.get(userId);
 
@@ -51,7 +56,7 @@ public class UsersController {
     return ResponseEntity.ok(user);
   }
 
-  @DeleteMapping("/{userId}")
+  @DeleteMapping("/users/{userId}")
   public ResponseEntity<Void> deleteUser(@PathVariable int userId) {
     if (!users.containsKey(userId)) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -61,7 +66,7 @@ public class UsersController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @PatchMapping("/{userId}/name")
+  @PatchMapping("/users/{userId}/name")
   public ResponseEntity<Void> updateUserName(@PathVariable int userId, @RequestBody String newName) {
     User user = users.get(userId);
 
@@ -73,7 +78,7 @@ public class UsersController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @PatchMapping("/{userId}/role")
+  @PatchMapping("/users/{userId}/role")
   public ResponseEntity<Void> updateUserRole(@PathVariable int userId, @RequestBody String newRole) {
     User user = users.get(userId);
 

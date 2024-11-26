@@ -5,14 +5,17 @@ import be.vinci.ipl.projet2024.group07.gateway.data.AttacksProxy;
 import be.vinci.ipl.projet2024.group07.gateway.data.AuthenticationProxy;
 import be.vinci.ipl.projet2024.group07.gateway.data.ServersProxy;
 import be.vinci.ipl.projet2024.group07.gateway.data.TargetsProxy;
+import be.vinci.ipl.projet2024.group07.gateway.data.UsersProxy;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.BadRequestException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.ConflictException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.NotFoundException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.UnauthorizedException;
 import be.vinci.ipl.projet2024.group07.gateway.models.Attack;
 import be.vinci.ipl.projet2024.group07.gateway.models.Credentials;
+import be.vinci.ipl.projet2024.group07.gateway.models.Exploit;
 import be.vinci.ipl.projet2024.group07.gateway.models.Server;
 import be.vinci.ipl.projet2024.group07.gateway.models.Target;
+import be.vinci.ipl.projet2024.group07.gateway.models.User;
 import feign.FeignException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,13 +28,15 @@ public class GatewayService {
   private AuthenticationProxy authenticationProxy;
   private ServersProxy serversProxy;
   private TargetsProxy targetsProxy;
+  private UsersProxy usersProxy;
 
   public GatewayService(AttacksProxy attacksProxy, AuthenticationProxy authenticationProxy, ServersProxy serversProxy,
-      TargetsProxy targetsProxy) {
+      TargetsProxy targetsProxy, UsersProxy usersProxy) {
     this.attacksProxy = attacksProxy;
     this.authenticationProxy = authenticationProxy;
     this.serversProxy = serversProxy;
     this.targetsProxy = targetsProxy;
+    this.usersProxy = usersProxy;
   }
 
   public String connect(Credentials credentials) throws UnauthorizedException, BadRequestException {
@@ -59,6 +64,115 @@ public class GatewayService {
       }
     }
   }
+
+  public User readOneUserByEmail(String email) throws NotFoundException {
+    try {
+      return usersProxy.getUserByEmail(email);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void createUser(Credentials userWithCredentials)
+      throws BadRequestException, ConflictException {
+    try {
+      usersProxy.createOne(userWithCredentials);
+    } catch (FeignException e) {
+      if (e.status() == 400) {
+        throw new BadRequestException();
+      } else if (e.status() == 409) {
+        throw new ConflictException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public User readOneUserById(int userId) throws NotFoundException {
+    try {
+      return usersProxy.readOneByUserId(userId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void deleteUser(int userId) throws NotFoundException {
+    try {
+      usersProxy.deleteOne(userId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void updateUserName(int userId, String name)
+      throws BadRequestException, NotFoundException {
+    try {
+      usersProxy.updateName(userId, name);
+    } catch (FeignException e) {
+      if (e.status() == 400) {
+        throw new BadRequestException();
+      } else if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void updateUserRole(int userId, String role)
+      throws BadRequestException, NotFoundException {
+    try {
+      usersProxy.updateRole(userId, role);
+    } catch (FeignException e) {
+      if (e.status() == 400) {
+        throw new BadRequestException();
+      } else if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  public void updateUserPassword(int userId, Credentials userWithCredentials)
+      throws BadRequestException, NotFoundException {
+    try {
+      usersProxy.updatePassword(userId, userWithCredentials);
+    } catch (FeignException e) {
+      if (e.status() == 400) {
+        throw new BadRequestException();
+      } else if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  Iterable<Exploit> readAllUserExploits(int userId) throws NotFoundException {
+    try {
+      return usersProxy.readAllUserExploits(userId);
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        throw new NotFoundException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
 
 
   public Iterable<Target> readAllTargets(int minServers, int minRevenue) {

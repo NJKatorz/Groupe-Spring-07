@@ -1,5 +1,8 @@
 @baseUrl = http://localhost:8080
 
+### Read one user by his email
+GET {{baseUrl}}/users?email=nath@gmail.com
+
 ### Read all targets
 GET {{baseUrl}}/targets
 

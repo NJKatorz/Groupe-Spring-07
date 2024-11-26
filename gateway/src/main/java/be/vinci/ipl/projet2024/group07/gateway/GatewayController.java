@@ -28,9 +28,56 @@ public class GatewayController {
     this.service = service;
   }
 
+  @GetMapping("/users")
+  public User readUserByEmail(@RequestParam(value = "email") String email) {
+    return service.readOneUserByEmail(email);
+  }
+
+  @PostMapping("/users")
+  public ResponseEntity<Void> createUser(@RequestBody Credentials userWithCredentials){
+    service.createUser(userWithCredentials);
+    return new ResponseEntity<>(HttpStatus.CREATED);
+  }
+
+
   @PostMapping("/login")
   public ResponseEntity<String> login(@RequestBody Credentials credentials) {
     return new ResponseEntity<>(service.connect(credentials), HttpStatus.OK);
+  }
+
+  @GetMapping("/users/{userId}")
+  public User readUserByUserId(@PathVariable int userId) {
+    return service.readOneUserById(userId);
+  }
+
+  @DeleteMapping("/users/{userId}")
+  public void deleteUser(@PathVariable int userId, @RequestHeader("Authorization") String token) {
+    service.verify(token);
+    service.deleteUser(userId);
+  }
+
+  @PatchMapping("/users/{userId}/name")
+  public void updateUserName(@PathVariable int userId, @RequestBody String newName, @RequestHeader("Authorization") String token) {
+    service.verify(token);
+    service.updateUserName(userId, newName);
+  }
+
+  @PatchMapping("/users/{userId}/role")
+  public void updateUserRole(@PathVariable int userId, @RequestBody String newRole, @RequestHeader("Authorization") String token) {
+    service.verify(token);
+    service.updateUserRole(userId, newRole);
+  }
+
+  @PatchMapping("/users/{userId}/password")
+  public void updatePassword(@PathVariable int userId, @RequestBody Credentials userWithCredentials,
+      @RequestHeader("Authorization") String token) {
+    service.verify(token);
+    service.updateUserPassword(userId, userWithCredentials);
+  }
+
+  @GetMapping("/users/{userId}/exploits")
+  public Iterable<Exploit> readAllExploitsByUserId(@PathVariable int userId) {
+    return service.readAllUserExploits(userId);
   }
 
   @GetMapping("/targets")

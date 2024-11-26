@@ -17,7 +17,7 @@ public class UserWithCredentials {
    * @return un objet User
    */
   public User toUser() {
-    return new User(null, name, email, "user"); // Le rôle par défaut est "user"
+    return new User(1, name, email, "user"); // Le rôle par défaut est "user"
   }
 
   /**
