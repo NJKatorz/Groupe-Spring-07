@@ -1,18 +1,88 @@
 @baseUrl = http://localhost:8080
 
-### Connect an user
+### Connect an user (error)
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "",
+  "email": "john.doe@example.com",
+  "password": "user123"
+}
+
+> {% client.global.set("token", response.body) %}
+
+### Create an user
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "role": "user",
+  "password": "user123"
+}
+
+### Create an admin
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Marc Evans",
+  "email": "marc.evans@example.com",
+  "role": "admin",
+  "password": "admin123"
+}
+
+### Connect an user (error)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "false"
+}
+
+> {% client.global.set("token", response.body) %}
+
+### Connect an user (error)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
   "password": ""
 }
 
 > {% client.global.set("token", response.body) %}
 
-### Read one user by his email
+### Connect an user
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "user123"
+}
+
+> {% client.global.set("token", response.body) %}
+
+### Read one user by his email (error)
 GET {{baseUrl}}/users?email=nath@gmail.com
+
+### Read one user by his email
+GET {{baseUrl}}/users?email=john.doe@example.com
+
+### Read one user by his id
+GET {{baseUrl}}/users/1
+
+### Read one user by his id (error)
+GET {{baseUrl}}/users/15
+
+### Read one user by his id (error)
+GET {{baseUrl}}/users/1
+
+### Delete one user by his id
+DELETE {{baseUrl}}/users/1
 
 ### Read all targets
 GET {{baseUrl}}/targets
@@ -20,6 +90,7 @@ GET {{baseUrl}}/targets
 ### Create a target
 POST {{baseUrl}}/targets
 Content-Type: application/json
+Authorization: {{token}}
 
 {
   "companyName": "TestCompany",

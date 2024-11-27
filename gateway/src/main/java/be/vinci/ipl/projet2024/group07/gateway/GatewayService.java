@@ -177,7 +177,7 @@ public class GatewayService {
   }
 
   public Iterable<Target> readAllTargets(int minServers, int minRevenue) {
-    return targetsProxy.readAll(minServers, minRevenue);
+    return targetsProxy.getAllTargets(minServers, minRevenue);
   }
 
   public void createTarget(Target target) throws BadRequestException, ConflictException {
@@ -233,7 +233,7 @@ public class GatewayService {
     }
   }
 
-  public Iterable<Target> readColocated() {
+  public Iterable<String> readColocated() {
     return targetsProxy.readColocated();
   }
 

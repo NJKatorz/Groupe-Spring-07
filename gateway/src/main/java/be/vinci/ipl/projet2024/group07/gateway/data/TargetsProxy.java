@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface TargetsProxy {
 
   @GetMapping("/targets")
-  Iterable<Target> readAll(@RequestParam(value = "minServers", required = false) int minServers,
+  Iterable<Target> getAllTargets(@RequestParam(value = "minServers", required = false) int minServers,
       @RequestParam(value = "minRevenue", required = false) int minRevenue);
 
   @PostMapping("/targets")
@@ -32,5 +32,5 @@ public interface TargetsProxy {
   void deleteOne(@PathVariable int targetId);
 
   @GetMapping("/targets/colocated")
-  Iterable<Target> readColocated();
+  Iterable<String> readColocated();
 }
