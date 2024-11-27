@@ -2,6 +2,7 @@ package be.vinci.ipl.projet2024.group07.targets;
 
 import be.vinci.ipl.projet2024.group07.targets.models.Target;
 import be.vinci.ipl.projet2024.group07.targets.repositories.TargetsRepository;
+import java.util.ArrayList;
 
 public class TargetsService {
     private TargetsRepository targetsRepository;
@@ -33,5 +34,9 @@ public class TargetsService {
         if (!targetsRepository.existsById(target.getId())) return false;
         targetsRepository.save(target);
         return true;
+    }
+
+    public Iterable<Target> getColocatedTargets() {
+        return new ArrayList<>();
     }
 }
