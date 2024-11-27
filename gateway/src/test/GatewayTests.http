@@ -1,5 +1,16 @@
 @baseUrl = http://localhost:8080
 
+### Connect an user
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "",
+  "password": ""
+}
+
+> {% client.global.set("token", response.body) %}
+
 ### Read one user by his email
 GET {{baseUrl}}/users?email=nath@gmail.com
 
