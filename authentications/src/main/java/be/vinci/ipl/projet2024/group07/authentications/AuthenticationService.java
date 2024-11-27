@@ -65,18 +65,6 @@ public class AuthenticationService {
   }
 
   /**
-   * Updates credentials in repository
-   * @param unsafeCredentials The credentials with insecure password
-   * @return True if the credentials were updated, or false if they couldn't be found
-   */
-  public boolean updateOne(UnsafeCredentials unsafeCredentials) {
-    if (!repository.existsById(unsafeCredentials.getEmail())) return false;
-    String hashedPassword = BCrypt.hashpw(unsafeCredentials.getPassword(), BCrypt.gensalt());
-    repository.save(unsafeCredentials.makeSafe(hashedPassword));
-    return true;
-  }
-
-  /**
    * Deletes credentials in repository
    * @param email The email of the user
    * @return True if the credentials were deleted, or false if they couldn't be found
