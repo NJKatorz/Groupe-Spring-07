@@ -1,6 +1,5 @@
 package be.vinci.ipl.projet2024.group07.mockattacks;
 
-import java.lang.annotation.Target;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,10 +10,25 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class Attack {
-    private int attackId;
+
+    private int id;
     private int targetId;
     private int serverId;
     private int exploitId;
-    private String status;
+    private Status status;
     private String notes;
+
+    public enum Status {
+        PlANIFIEE("planifiée"),
+        EN_COURS("en cours"),
+        TERMINEE("terminée"),
+        ECHOUEE("échouée");
+
+
+        private final String value;
+
+        Status(String value) {
+            this.value = value;
+        }
+    }
 }
