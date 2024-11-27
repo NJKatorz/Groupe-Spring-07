@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 public class TargetsController {
@@ -21,8 +22,10 @@ public class TargetsController {
   }
 
   @GetMapping("/targets")
-  public Iterable<Target> getAllTargets() {
-    return service.getAllTargets();
+  public Iterable<Target> getAllTargets(
+      @RequestParam(required = false) Integer minServers,
+      @RequestParam(required = false) Integer maxServers) {
+    return service.getAllTargets(minServers, maxServers);
   }
 
   @PostMapping("/targets")

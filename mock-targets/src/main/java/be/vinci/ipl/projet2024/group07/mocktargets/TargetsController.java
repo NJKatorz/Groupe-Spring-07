@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TargetsController {
 
   @GetMapping("/targets")
-  public Iterable<Target> readAll() {
+  public Iterable<Target> readAll(Integer minServers, Integer maxServers) {
     return new ArrayList<>();
   }
 

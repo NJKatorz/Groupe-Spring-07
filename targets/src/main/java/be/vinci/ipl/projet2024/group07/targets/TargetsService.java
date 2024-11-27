@@ -30,7 +30,7 @@ public class TargetsService {
         return targetsRepository.findById(id).orElse(null);
     }
 
-    public Iterable<Target> getAllTargets() {
+    public Iterable<Target> getAllTargets(Integer minServers, Integer maxServers) {
         return targetsRepository.findAll();
     }
 
@@ -46,7 +46,7 @@ public class TargetsService {
 
     public Iterable<String> getIpColocated() {
         Map<String, Set<Target>> dicoIp = new HashMap();
-        for (Target target : getAllTargets()) {
+        for (Target target : targetsRepository.findAll()) {
             Iterable<Server> servers = serversProxy.readByTarget(target.getId());
             for (Server server : servers) {
                 if (dicoIp.containsKey(server.getIpAddress())) {
