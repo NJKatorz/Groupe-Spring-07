@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class AuthenticationsController {
 
-
   @PostMapping("/auth/register")
   public ResponseEntity<Void> register( @RequestBody Credentials credentials) {
     return new ResponseEntity<>(HttpStatus.CREATED);
