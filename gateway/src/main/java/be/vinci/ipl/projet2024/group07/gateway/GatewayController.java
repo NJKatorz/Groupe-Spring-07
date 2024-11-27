@@ -29,8 +29,8 @@ public class GatewayController {
   }
 
   @GetMapping("/users")
-  public User readUserByEmail(@RequestParam(value = "email") String email) {
-    return service.readOneUserByEmail(email);
+  public ResponseEntity<User> readUserByEmail(@RequestParam(value = "email") String email) {
+    return new ResponseEntity<>(service.readOneUserByEmail(email), HttpStatus.OK);
   }
 
   @PostMapping("/users")
@@ -46,44 +46,48 @@ public class GatewayController {
   }
 
   @GetMapping("/users/{userId}")
-  public User readUserByUserId(@PathVariable int userId) {
-    return service.readOneUserById(userId);
+  public ResponseEntity<User> readUserByUserId(@PathVariable int userId) {
+    return new ResponseEntity<>(service.readOneUserById(userId), HttpStatus.OK);
   }
 
   @DeleteMapping("/users/{userId}")
-  public void deleteUser(@PathVariable int userId, @RequestHeader("Authorization") String token) {
+  public ResponseEntity<Void> deleteUser(@PathVariable int userId, @RequestHeader("Authorization") String token) {
     service.verify(token);
     service.deleteUser(userId);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PatchMapping("/users/{userId}/name")
-  public void updateUserName(@PathVariable int userId, @RequestBody String newName, @RequestHeader("Authorization") String token) {
+  public ResponseEntity<Void> updateUserName(@PathVariable int userId, @RequestBody String newName, @RequestHeader("Authorization") String token) {
     service.verify(token);
     service.updateUserName(userId, newName);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PatchMapping("/users/{userId}/role")
-  public void updateUserRole(@PathVariable int userId, @RequestBody String newRole, @RequestHeader("Authorization") String token) {
+  public ResponseEntity<Void> updateUserRole(@PathVariable int userId, @RequestBody String newRole, @RequestHeader("Authorization") String token) {
     service.verify(token);
     service.updateUserRole(userId, newRole);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 //  @PatchMapping("/users/{userId}/password")
-//  public void updatePassword(@PathVariable int userId, @RequestBody Credentials userWithCredentials,
+//  public ResponseEntity<Void> updatePassword(@PathVariable int userId, @RequestBody Credentials userWithCredentials,
 //      @RequestHeader("Authorization") String token) {
 //    service.verify(token);
 //    service.updateUserPassword(userId, userWithCredentials);
+//    return new ResponseEntity<>(HttpStatus.OK);
 //  }
 
   @GetMapping("/users/{userId}/exploits")
-  public Iterable<Exploit> readAllExploitsByUserId(@PathVariable int userId) {
-    return service.readAllUserExploits(userId);
+  public ResponseEntity<Iterable<Exploit>> readAllExploitsByUserId(@PathVariable int userId) {
+    return new ResponseEntity<>(service.readAllUserExploits(userId), HttpStatus.OK);
   }
 
   @GetMapping("/targets")
-  public Iterable<Target> readAllTargets(@RequestParam(value = "minServers", required = false) int minServers,
+  public ResponseEntity<Iterable<Target>> readAllTargets(@RequestParam(value = "minServers", required = false) int minServers,
       @RequestParam(value = "minRevenue", required = false) int minRevenue){
-    return service.readAllTargets(minServers, minRevenue);
+    return new ResponseEntity<>(service.readAllTargets(minServers, minRevenue), HttpStatus.OK);
   }
 
   @PostMapping("/targets")
@@ -93,32 +97,34 @@ public class GatewayController {
   }
 
   @GetMapping("/targets/{targetId}")
-  public Target readTarget(@PathVariable int targetId){
-    return service.readOneTarget(targetId);
+  public ResponseEntity<Target> readTarget(@PathVariable int targetId){
+    return new ResponseEntity<>(service.readOneTarget(targetId), HttpStatus.OK);
   }
 
   @PutMapping("/targets/{targetId}")
-  public void updateTarget(@PathVariable int targetId, @RequestBody Target target) {
+  public ResponseEntity<Void> updateTarget(@PathVariable int targetId, @RequestBody Target target) {
     if (target.getId() != targetId){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target id mismatch");
     }
 
     service.updateTarget(targetId, target);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @DeleteMapping("/targets/{targetId}")
-  public void deleteTarget(@PathVariable int targetId) {
+  public ResponseEntity<Void> deleteTarget(@PathVariable int targetId) {
     service.deleteTarget(targetId);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @GetMapping("/targets/{targetId}/servers")
-  public Iterable<Server> readAllServersByTargetId(@PathVariable int targetId){
-    return service.readAllServersByTargetId(targetId);
+  public ResponseEntity<Iterable<Server>> readAllServersByTargetId(@PathVariable int targetId){
+    return new ResponseEntity<>(service.readAllServersByTargetId(targetId), HttpStatus.OK);
   }
 
   @GetMapping("/targets/colocated")
-  public Iterable<Target> readAllColocatedTargets(){
-    return service.readColocated();
+  public ResponseEntity<Iterable<Target>> readAllColocatedTargets(){
+    return new ResponseEntity<>(service.readColocated(), HttpStatus.OK);
   }
 
 
@@ -129,30 +135,33 @@ public class GatewayController {
   }
 
   @GetMapping("servers/{serverId}")
-  public Server readServer(@PathVariable int serverId){
-    return service.readOneServer(serverId);
+  public ResponseEntity<Server> readServer(@PathVariable int serverId){
+    return new ResponseEntity<>(service.readOneServer(serverId), HttpStatus.OK);
   }
 
   @PutMapping("servers/{serverId}")
-  public void updateServer(@PathVariable int serverId, @RequestBody Server server) {
+  public ResponseEntity<Void> updateServer(@PathVariable int serverId, @RequestBody Server server) {
     if (serverId != server.getId())
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Server id mismatch");
     service.updateServer(serverId, server);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @DeleteMapping("servers/{serverId}")
-  public void deleteServer(@PathVariable int serverId) {
+  public ResponseEntity<Void> deleteServer(@PathVariable int serverId) {
     service.deleteServer(serverId);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PatchMapping("/servers/{serverId}/validate")
-  public void validateServer(@PathVariable int serverId) {
+  public ResponseEntity<Void> validateServer(@PathVariable int serverId) {
     service.validateServer(serverId);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @GetMapping("/exploits")
-  public Iterable<Exploit> readAllExploits(@RequestParam(value = "serverType", required = false) String serverType) {
-    return service.readAllExploits(serverType);
+  public ResponseEntity<Iterable<Exploit>> readAllExploits(@RequestParam(value = "serverType", required = false) String serverType) {
+    return new ResponseEntity<>(service.readAllExploits(serverType), HttpStatus.OK);
   }
 
   @PostMapping("/exploits")
@@ -162,31 +171,34 @@ public class GatewayController {
   }
 
   @GetMapping("/exploits/{exploitId}")
-  public Exploit readOneExploit(@PathVariable int exploitId) {
-    return service.readOneExploit(exploitId);
+  public ResponseEntity<Exploit> readOneExploit(@PathVariable int exploitId) {
+    return new ResponseEntity<>(service.readOneExploit(exploitId), HttpStatus.OK);
   }
 
   @PutMapping("/exploits/{exploitId}")
-  public void updateExploit(@PathVariable int exploitId, @RequestBody Exploit exploit) {
+  public ResponseEntity<Void> updateExploit(@PathVariable int exploitId, @RequestBody Exploit exploit) {
     if (exploit.getId() != exploitId){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target id mismatch");
     }
     service.updateExploit(exploitId, exploit);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @DeleteMapping("/exploits/{exploitId}")
-  public void deleteExploit(@PathVariable int exploitId) {
+  public ResponseEntity<Void> deleteExploit(@PathVariable int exploitId) {
     service.deleteExploit(exploitId);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PatchMapping("/exploits/{exploitId}/validate")
-  public void validateExploit(@PathVariable int exploitId) {
+  public ResponseEntity<Void> validateExploit(@PathVariable int exploitId) {
     service.validateExploit(exploitId);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @GetMapping("/attacks")
-  public Iterable<Attack> readAllAttacks(){
-    return service.readAllAttacks();
+  public ResponseEntity<Iterable<Attack>> readAllAttacks(){
+    return new ResponseEntity<>(service.readAllAttacks(), HttpStatus.OK);
   }
 
   @PostMapping("/attacks")
@@ -196,37 +208,43 @@ public class GatewayController {
   }
 
   @GetMapping("/attacks/{attackId}")
-  public Attack readOneAttack(@PathVariable int attackId){
-    return service.readOneAttack(attackId);
+  public ResponseEntity<Attack> readOneAttack(@PathVariable int attackId){
+    return new ResponseEntity<>(service.readOneAttack(attackId), HttpStatus.OK);
   }
 
   @DeleteMapping("/attacks/{attackId}")
-  public void deleteAttack(@PathVariable int attackId){
+  public ResponseEntity<Void> deleteAttack(@PathVariable int attackId){
     service.deleteAttack(attackId);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PatchMapping("/attacks/{attackId}/notes")
-  public void updateNotesAttack(@PathVariable int attackId, @RequestBody String notes){
+  public ResponseEntity<Void> updateNotesAttack(@PathVariable int attackId, @RequestBody String notes){
     service.updateNotesAttack(attackId, notes);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PatchMapping("/attacks/{attackId}/server")
-  public void addServerToAttack(@PathVariable int attackId, @RequestBody int serverId){
+  public ResponseEntity<Void> addServerToAttack(@PathVariable int attackId, @RequestBody int serverId){
     service.addServerToAttack(attackId, serverId);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PatchMapping("/attacks/{attackId}/exploit")
-  public void addExploitToAttack(@PathVariable int attackId, @RequestBody int exploitId){
+  public ResponseEntity<Void> addExploitToAttack(@PathVariable int attackId, @RequestBody int exploitId){
     service.addExploitToAttack(attackId, exploitId);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/attacks/{attackId}/launch")
-  public void launchAttack(@PathVariable int attackId){
+  public ResponseEntity<Void> launchAttack(@PathVariable int attackId){
     service.lauchAttack(attackId);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/attacks/{attackId}/result")
-  public void recordResult(@PathVariable int attackId, @RequestBody String result){
+  public ResponseEntity<Void> recordResult(@PathVariable int attackId, @RequestBody String result){
     service.recordResult(attackId, result);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }
