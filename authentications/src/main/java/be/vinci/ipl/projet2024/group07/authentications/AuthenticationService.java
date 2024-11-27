@@ -1,5 +1,6 @@
 package be.vinci.ipl.projet2024.group07.authentications;
 
+import be.vinci.ipl.projet2024.group07.authentications.models.ChangePassword;
 import be.vinci.ipl.projet2024.group07.authentications.models.SafeCredentials;
 import be.vinci.ipl.projet2024.group07.authentications.models.UnsafeCredentials;
 import com.auth0.jwt.JWT;
@@ -32,7 +33,7 @@ public class AuthenticationService {
     SafeCredentials safeCredentials = repository.findById(unsafeCredentials.getEmail()).orElse(null);
     if (safeCredentials == null) return null;
     if (!BCrypt.checkpw(unsafeCredentials.getPassword(), safeCredentials.getHashedPassword())) return null;
-    return JWT.create().withIssuer("auth0").withClaim("pseudo", safeCredentials.getEmail()).sign(jwtAlgorithm);
+    return JWT.create().withIssuer("auth0").withClaim("email", safeCredentials.getEmail()).sign(jwtAlgorithm);
   }
 
 
@@ -44,7 +45,10 @@ public class AuthenticationService {
   public String verify(String token) {
     try {
       String email = jwtVerifier.verify(token).getClaim("email").asString();
-      if (!repository.existsById(email)) return null;
+      if (!repository.existsById(email)) {
+        System.out.println(email);
+        return null;
+      }
       return email;
     } catch (JWTVerificationException e) {
       return null;
@@ -77,12 +81,11 @@ public class AuthenticationService {
   /**
    * Changes password of user
    * @param request The credentials with insecure password
-   * @param newPassword The new password
    * @return True if the password was changed, or false if the user couldn't be found
    */
-  public boolean changePassword(UnsafeCredentials request, String newPassword) {
+  public boolean changePassword(ChangePassword request) {
     if (!repository.existsById(request.getEmail())) return false;
-    String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+    String hashedPassword = BCrypt.hashpw(request.getNewPassword(), BCrypt.gensalt());
     repository.save(request.makeSafe(hashedPassword));
     return true;
   }

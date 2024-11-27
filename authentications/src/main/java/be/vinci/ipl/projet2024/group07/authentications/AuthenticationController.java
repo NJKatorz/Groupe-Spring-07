@@ -1,6 +1,7 @@
 package be.vinci.ipl.projet2024.group07.authentications;
 
 import be.vinci.ipl.projet2024.group07.authentications.AuthenticationService;
+import be.vinci.ipl.projet2024.group07.authentications.models.ChangePassword;
 import be.vinci.ipl.projet2024.group07.authentications.models.UnsafeCredentials;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,28 +45,30 @@ public class AuthenticationController {
 
   @PostMapping("/auth/verify-token")
   public ResponseEntity<String> verifyToken(@RequestBody String token) {
-    if (Objects.isNull(token)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token");
-    }
+    //if (Objects.isNull(token)) {
+    //  throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token");
+   // }
     String email = service.verify(token);
-    if (Objects.isNull(email)) {
+    if (email == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
     }
     return new ResponseEntity<>(email, HttpStatus.OK);
   }
 
   @PatchMapping("/auth/change-password")
-  public ResponseEntity<Void> changePassword(@RequestBody UnsafeCredentials request, @RequestParam String newPassword) {
-    if (request.invalid() || newPassword == null || newPassword.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid credentials");
+  public ResponseEntity<Void> changePassword(@RequestBody ChangePassword request) {
+    if (request.invalid()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid credentials or missing fields");
     }
-    boolean changed = service.changePassword(request, newPassword);
+
+    boolean changed = service.changePassword(request);
     if (!changed) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid old credentials");
     }
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }//Pas sur de la methode
+  }
+
 
   @DeleteMapping("/auth/delete")
   public ResponseEntity<Void> delete(@RequestBody String email) {

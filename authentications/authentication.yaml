@@ -1,0 +1,154 @@
+openapi: 3.0.0
+info:
+  title: Service authentication
+  description: API pour la gestion de l'authentification des utilisateurs dans la plateforme Vinci Cyber Intelligence.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8086
+    description: Serveur local
+
+paths:
+  /auth/register:
+    post:
+      summary: Enregistre les credentials d'un nouvel utilisateur
+      description: Permet d'enregistrer les credentials d'un nouvel utilisateur.
+      requestBody:
+        required: true
+        description:  
+          Données des credentials à enregistrer. 
+          Doit inclure un email et un password.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+      responses:
+        '201':
+          description: Les credentials ont été enregistrés
+        '400':
+          description: Les données des credentials sont manquantes ou incorrectes
+        '409':
+          description: Un utilisateur existe déjà avec cet email
+
+  /auth/login:
+    post:
+      summary: Authentifie un utilisateur
+      description: 
+        Permet d'authentifier un utilisateur. 
+        Retourne un token JWT si l'authentification est réussie.
+      requestBody:
+        required: true
+        description: Credentials de l'utilisateur, doit inclure un email et un password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+      responses:
+        '200':
+          description: Authentification réussie, renvoie un token de connexion JWT
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIzNDU2Nzg5LCJuYW1lIjoiSm9zZXBoIn0.OpOSSw7e485LOP5PrzScxHb7SR6sAOMRckfFwi4rp7o
+        '400':
+          description: Les données des credentials sont manquantes ou incorrectes
+        '401':
+          description: Authentification échouée, email ou mot de passe incorrect
+
+  /auth/verify-token:
+    post:
+      summary: Vérifie la validité d'un token JWT
+      description: Permet de vérifier si un token JWT est valide et de récupérer l'email de l'utilisateur associé.
+      requestBody:
+        required: true
+        description: Token de connexion JWT
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIzNDU2Nzg5LCJuYW1lIjoiSm9zZXBoIn0.OpOSSw7e485LOP5PrzScxHb7SR6sAOMRckfFwi4rp7o
+      responses:
+        '200':
+          description: Token valide, renvoie l'email de l'utilisateur
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "john.doe@example.com"
+        '400':
+          description: Le token est manquant
+        '401':
+          description: Le token n'a pas pu être validé
+
+  /auth/change-password:
+    patch:
+      summary: Change le mot de passe de l'utilisateur
+      description: Permet à un utilisateur de changer son mot de passe.
+      requestBody:
+        required: true
+        description: Credentials actuels et nouveau mot de passe
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Email de l'utilisateur
+                oldPassword:
+                  type: string
+                  description: Ancien mot de passe
+                newPassword:
+                  type: string
+                  description: Nouveau mot de passe
+              required:
+                - email
+                - oldPassword
+                - newPassword
+              example:
+                email: "john.doe@example.com"
+                oldPassword: "password123"
+                newPassword: "newpassword123"
+      responses:
+        '204':
+          description: Le mot de passe de l'utilisateur a été changé
+        '400':
+          description: Les données de la requête sont manquantes
+        '401':
+          description: Authentification échouée, email ou ancien mot de passe incorrect
+
+  /auth/delete:
+    delete:
+      summary: Supprime les credentials d'un utilisateur
+      description: Permet de supprimer les credentials d'un utilisateur en utilisant son email.
+      requestBody:
+        required: true
+        description: Email de l'utilisateur
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: "john.doe@vinci.be"
+                  
+      responses:
+        '204':
+          description: Le credentials ont été supprimés
+        '400':
+          description: Email de l'utilisateur manquant
+        '404':
+          description: Aucun credentials trouvé pour cet email
+
+components:
+  schemas:
+    Credentials:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email de l'utilisateur
+        password:
+          type: string
+          description: Mot de passe de l'utilisateur
+      example:
+        email: "john.doe@example.com"
+        password: "password123"
