@@ -1,0 +1,210 @@
+openapi: 3.0.0
+info:
+  title: Service servers
+  description: API pour la gestion des serveurs dans la plateforme Vinci Cyber Intelligence.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8083
+    description: Serveur local
+
+paths:
+  /servers:
+    post:
+      summary: Crée un nouveau serveur
+      description: 
+        Permet de créer un nouveau serveur. 
+        L'ID du serveur sera autogénérée.
+        À sa création, le serveur ne sera pas encore validée.
+        Vérifie que l'ID de la cible à qui il appartient correspond bien à une cible existant dans le service targets.
+        Cette opération augmente également le nombre de serveurs de la cible associée dans le service targets.
+      requestBody:
+        required: true
+        description: 
+          Données du serveur à créer.
+          Doit inclure une adresse IP, l'ID de la cible à qui il appartient, le type de serveur et la technologie utilisée. 
+          L'ID de la cible doit correspondre à une cible existante.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ipAddress:
+                  type: string
+                  description: Adresse IP du serveur
+                targetId:
+                  type: integer
+                  description: Identifiant de la cible à qui appartient le serveur
+                serverType:
+                  type: string
+                  description: Type de serveur
+                  enum:
+                    - web
+                    - database
+                    - backup
+                    - mail
+                    - workstation
+                    - ...
+                technology:
+                  type: string
+                  description: Technologie utilisée par le serveur
+              example:
+                ipAddress: "192.168.1.1"
+                targetId: 54321
+                serverType: "web"
+                technology: "Apache"
+      responses:
+        '201':
+          description: Serveur créé, renvoie ses données y compris son ID autogénéré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Server'
+        '400':
+          description: Les données du serveur sont manquantes ou incorrectes
+
+  /servers/{serverId}:
+    parameters:
+      - name: serverId
+        in: path
+        required: true
+        description: ID du serveur
+        schema:
+          type: integer
+          example: 67890
+    get:
+      summary: Consulte les détails d'un serveur
+      description: Récupère les détails d'un serveur spécifique en utilisant son ID.
+      responses:
+        '200':
+          description: Renvoie les détails du serveur correspondant à cet ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Server'
+        '404':
+          description: Aucun serveur trouvé pour cet ID
+    put:
+      summary: Modifie un serveur
+      description: 
+        Permet de modifier les détails d'un serveur existant en utilisant son ID. 
+        Il n'est pas possible de modifier l'ID du serveur ou l'ID de la cible à qui le serveur appartient.
+        Le serveur ne sera pas validé de cette manière.
+      requestBody:
+        required: true
+        description: 
+          Nouvelles données du serveur à modifier.
+          L'ID du serveur, l'ID de la cible associée et le statut de validation doivent avoir la même valeur que la donnée actuelle.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Server'
+      responses:
+        '204':
+          description: Le serveur a été modifié
+        '400':
+          description: Les nouvelles données du serveur sont manquantes ou incorrectes
+        '404':
+          description: Aucun serveur trouvé pour cet ID
+    delete:
+      summary: Supprime un serveur
+      description: 
+        Supprime un serveur spécifique en utilisant son ID. 
+        Supprime également les attaques associées à ce serveur dans le service attacks pour assurer la consistance des données.
+        Cette opération diminue également le nombre de serveurs de la cible associée dans le service targets.
+      responses:
+        '204':
+          description: Le serveur et les attaques assocées ont été supprimés
+        '404':
+          description: Aucun serveur trouvé pour cet ID
+
+  /servers/{serverId}/validate:
+    patch:
+      summary: Valide un serveur
+      description: 
+        Valide un serveur spécifique en utilisant son ID.
+        Le serveur ne peut pas déjà avoir été validé.
+      parameters:
+        - name: serverId
+          in: path
+          required: true
+          description: ID du serveur à valider
+          schema:
+            type: integer
+            example: 67890
+      responses:
+        '204':
+          description: Le serveur a bien été validé
+        '400':
+          description: Le serveur était déjà validé
+        '404':
+          description: Aucun serveur trouvé pour cet ID
+
+  /servers/target/{targetId}:
+    parameters:
+      - name: targetId
+        in: path
+        required: true
+        description: ID de la cible
+        schema:
+          type: integer
+          example: 54321
+    get:
+      summary: Liste les serveurs d'une cible
+      description: Récupère une liste de tous les serveurs associés à une cible spécifique en utilisant son ID.
+      responses:
+        '200':
+          description: Renvoie la liste des serveurs de la cible
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Server'
+
+    delete:
+      summary: Supprime les serveurs d'une cible
+      description: 
+        Supprime tous les serveurs associés à une cible spécifique en utilisant son ID.
+        Supprime également les attaques associées à ces serveurs dans le service attacks pour assurer la consistance des données.
+        Ne modifie pas dans ce cas-ci le nombre de serveurs de la cible, car elle va également être supprimée dans le service targets.
+      responses:
+        '204':
+          description: Les serveurs de la cible et les attaques associées ont été supprimés
+
+components:
+  schemas:
+    Server:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique du serveur
+        ipAddress:
+          type: string
+          description: Adresse IP du serveur
+        targetId:
+          type: integer
+          description: Identifiant de la cible à qui appartient le serveur
+        serverType:
+          type: string
+          description: Type de serveur
+          enum:
+            - web
+            - database
+            - backup
+            - mail
+            - workstation
+            - ...
+        technology:
+          type: string
+          description: Technologie utilisée par le serveur
+        validated:
+          type: boolean
+          description: Statut de validation du serveur
+      example:
+        id: 67890
+        ipAddress: "192.168.1.1"
+        targetId: 54321
+        serverType: "web"
+        technology: "Apache"
+        validated: false
