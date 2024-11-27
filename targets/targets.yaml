@@ -1,0 +1,255 @@
+openapi: 3.0.0
+info:
+  title: Service targets
+  description: API pour la gestion des cibles dans la plateforme Vinci Cyber Intelligence.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8082
+    description: Serveur local
+
+paths:
+  /targets:
+    get:
+      summary: Liste toutes les cibles
+      description: 
+        Récupère une liste de toutes les cibles enregistrées dans la plateforme.
+        L'utilisateur peut filtrer les cibles par nombre de serveurs ou chiffres d'affaires minimum en ajoutant des paramètres de requête optionnels.
+      parameters:
+        - name: minServers
+          in: query
+          required: false
+          description: Nombre minimum de serveur de la cible
+          schema:
+            type: integer
+            example: 20
+        - name: minRevenue
+          in: query
+          required: false
+          description: Chiffre d'affaire minimum de la cible
+          schema:
+            type: number
+            example: 10000000
+      responses:
+        '200':
+          description: Renvoie la liste des cibles correspondant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Target'
+    post:
+      summary: Crée une nouvelle cible
+      description: 
+        Permet de créer une nouvelle cible. 
+        L'ID de la cible sera autogénéré.
+        Le nombre de serveurs sera initialisé à zéro.
+        Le nombre d'employé et le chiffre d'affaire doivent être supérieurs à zéro.
+      requestBody:
+        required: true
+        description: 
+          Données de la cible à créer.
+          Doit inclure le nom de l'entreprise, le domaine, la localisation, le nombre d'employés, et le chiffre d'affaires.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                companyName:
+                  type: string
+                  description: Nom de l'entreprise
+                domain:
+                  type: string
+                  description: Nom de domaine de l'entreprise
+                location:
+                  type: string
+                  description: Localisation de l'entreprise
+                employees:
+                  type: integer
+                  description: Nombre d'employés de l'entreprise
+                revenue:
+                  type: number
+                  description: Chiffre d'affaires de l'entreprise
+              example:
+                companyName: "CyberCorp"
+                domain: "cybercorp.com"
+                location: "Paris, France"
+                employees: 500
+                revenue: 1000000
+      responses:
+        '201':
+          description: Cible créée, renvoie ses données y compris son ID autogénéré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Target'
+        '400':
+          description: Les données de la cible sont manquantes ou incorrectes
+
+  /targets/{targetId}:
+    parameters:
+      - name: targetId
+        in: path
+        required: true
+        description: ID de la cible
+        schema:
+          type: string
+          example: 54321
+    get:
+      summary: Consulte les détails d'une cible
+      description: Récupère les détails d'une cible spécifique en utilisant son ID.
+      responses:
+        '200':
+          description: Renvoie les détails de la cible correspond à cet ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Target'
+        '404':
+          description: Aucune cible trouvée pour cet ID
+    put:
+      summary: Modifie une cible
+      description: 
+        Permet de modifier les détails d'une cible existante en utilisant son ID. 
+        Il n'est pas possible de modifier l'ID de la cible.
+        Le nombre de serveurs ne peut être modifié de cette manière.
+      requestBody:
+        required: true
+        description: 
+          Nouvelles données de la cible.
+          L'ID de la cible et le nombre de serveurs doivent la même valeur que la donnée actuelle.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Target'
+      responses:
+        '204':
+          description: La cible a été modifiée
+        '400':
+          description: Les nouvelles données de la cible sont manquantes ou incorrectes
+        '404':
+          description: Aucune cible trouvée pour cet ID
+    delete:
+      summary: Supprime une cible
+      description: 
+        Supprime une cible spécifique en utilisant son ID. 
+        Supprime également les serveurs associées à cette cible dans le service servers pour assurer la consistance des données.
+        Supprime également les attaques associées à cette cible dans le service attacks pour assurer la consistance des données.
+      responses:
+        '204':
+          description: La cible, les serveurs et les attaques correspondant ont été supprimée
+        '404':
+          description: Aucune cible trouvée pour cet ID
+
+  /targets/{targetId}/increase-servers:
+    patch:
+      summary: Augmente le nombre de serveurs d'une cible
+      description: Augmente le nombre de serveurs d'une cible spécifique en utilisant son ID.
+      parameters:
+        - name: targetId
+          in: path
+          required: true
+          description: ID de la cible
+          schema:
+            type: integer
+            example: 54321
+      responses:
+        '204':
+          description: Le nombre de serveurs a été augmenté
+        '404':
+          description: Aucune cible trouvée pour cet ID
+
+  /targets/{targetId}/decrease-servers:
+    patch:
+      summary: Diminue le nombre de serveurs d'une cible
+      description: Diminue le nombre de serveurs d'une cible spécifique en utilisant son ID.
+      parameters:
+        - name: targetId
+          in: path
+          required: true
+          description: ID de la cible
+          schema:
+            type: integer
+            example: 54321
+      responses:
+        '204':
+          description: Le nombre de serveurs a été diminué
+        '404':
+          description: Aucune cible trouvée pour cet ID
+
+  /targets/colocated:
+    get:
+      summary: Recherche des cibles co-localisées
+      description: 
+        Permet de rechercher des cibles qui sont hébergées sur des serveurs mutualisés.
+        Les recherches se font via le service des serveurs et seules les cibles hébergées sur des serveurs avec au moins deux cibles sont renvoyées. 
+        Les résultats incluent l'adresse IP du serveur mutualisé.
+      responses:
+        '200':
+          description: Renvoie les résultats de la recherche
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    serverIp:
+                      type: string
+                      description: Adresse IP du serveur mutualisé
+                    targets:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Target'
+                  example:
+                    serverIp: "192.168.1.1"
+                    targets:
+                      - id: 54321
+                        companyName: "CyberCorp"
+                        domain: "cybercorp.com"
+                        location: "Paris, France"
+                        employees: 500
+                        servers: 10
+                        revenue: 1000000
+                      - id: 98765
+                        companyName: "OtherCorp"
+                        domain: "othercorp.com"
+                        location: "Paris, France"
+                        employees: 20
+                        servers: 2
+                        revenue: 100000
+
+components:
+  schemas:
+    Target:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique de la cible
+        companyName:
+          type: string
+          description: Nom de l'entreprise
+        domain:
+          type: string
+          description: Nom de domaine de l'entreprise
+        location:
+          type: string
+          description: Localisation de l'entreprise
+        employees:
+          type: integer
+          description: Nombre d'employés de l'entreprise
+        servers:
+          type: integer
+          description: Nombre de serveurs de l'entreprise
+        revenue:
+          type: number
+          description: Chiffre d'affaires de l'entreprise
+      example:
+        id: 54321
+        companyName: "CyberCorp"
+        domain: "cybercorp.com"
+        location: "Paris, France"
+        employees: 500
+        servers: 10
+        revenue: 1000000
