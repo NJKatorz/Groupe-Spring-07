@@ -73,7 +73,7 @@ public class TargetsController {
   }
 
   @GetMapping("/targets/colocated")
-  public Iterable<Target> readColocated() {
-    return service.getColocatedTargets();
+  public Iterable<String> readColocated() {
+    return service.getIpColocated();
   }
 }
