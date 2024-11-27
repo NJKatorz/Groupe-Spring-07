@@ -1,5 +1,6 @@
 package be.vinci.ipl.projet2024.group07.mockattacks;
 
+import be.vinci.ipl.projet2024.group07.mockattacks.Attack.Status;
 import java.util.ArrayList;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +20,15 @@ public class AttacksController {
   }
 
   @GetMapping("/attacks/{attackId}")
-  public Attack readOne(@PathVariable int attackId) {
+  public ResponseEntity<Attack> readOne(@PathVariable int attackId) {
     Attack attack = new Attack();
-    attack.setAttackId(attackId);
+    attack.setId(attackId);
     attack.setTargetId(54321);
     attack.setServerId(12345);
     attack.setExploitId(67890);
-    attack.setStatus("In progress");
-    attack.setNotes("This is a note");
-    return attack;
+    attack.setStatus(Status.PlANIFIEE);
+    attack.setNotes("Ceci est une note");
+    return new ResponseEntity<>(attack, HttpStatus.OK);
   }
 
   @DeleteMapping("/attacks/{attackId}")
