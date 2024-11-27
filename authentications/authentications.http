@@ -1,0 +1,40 @@
+###
+POST http://localhost:8086/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+###
+POST http://localhost:8086/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+###
+POST http://localhost:8086/auth/verify-token
+Content-Type: text/plain
+
+eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoMCIsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSJ9.KT7Z7aaHIB8kiy56A1JuYYV7mhnJxU6omsF1CtD_22WrWA0d_9R2o29sR2hz-z2GJzys1EIeoZCza3nhqHKDzQ
+
+
+###
+PATCH http://localhost:8086/auth/change-password
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123",
+  "newPassword": "password1234"
+}
+
+###
+DELETE http://localhost:8086/auth/delete
+Content-Type: text/plain
+
+test@example.com
