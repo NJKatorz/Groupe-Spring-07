@@ -68,12 +68,12 @@ public class GatewayController {
     service.updateUserRole(userId, newRole);
   }
 
-  @PatchMapping("/users/{userId}/password")
-  public void updatePassword(@PathVariable int userId, @RequestBody Credentials userWithCredentials,
-      @RequestHeader("Authorization") String token) {
-    service.verify(token);
-    service.updateUserPassword(userId, userWithCredentials);
-  }
+//  @PatchMapping("/users/{userId}/password")
+//  public void updatePassword(@PathVariable int userId, @RequestBody Credentials userWithCredentials,
+//      @RequestHeader("Authorization") String token) {
+//    service.verify(token);
+//    service.updateUserPassword(userId, userWithCredentials);
+//  }
 
   @GetMapping("/users/{userId}/exploits")
   public Iterable<Exploit> readAllExploitsByUserId(@PathVariable int userId) {
@@ -150,6 +150,39 @@ public class GatewayController {
     service.validateServer(serverId);
   }
 
+  @GetMapping("/exploits")
+  public Iterable<Exploit> readAllExploits(@RequestParam(value = "serverType", required = false) String serverType) {
+    return service.readAllExploits(serverType);
+  }
+
+  @PostMapping("/exploits")
+  public ResponseEntity<Void> createExploit(@RequestBody Exploit exploit) {
+    service.createExploit(exploit);
+    return new ResponseEntity<>(HttpStatus.CREATED);
+  }
+
+  @GetMapping("/exploits/{exploitId}")
+  public Exploit readOneExploit(@PathVariable int exploitId) {
+    return service.readOneExploit(exploitId);
+  }
+
+  @PutMapping("/exploits/{exploitId}")
+  public void updateExploit(@PathVariable int exploitId, @RequestBody Exploit exploit) {
+    if (exploit.getId() != exploitId){
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target id mismatch");
+    }
+    service.updateExploit(exploitId, exploit);
+  }
+
+  @DeleteMapping("/exploits/{exploitId}")
+  public void deleteExploit(@PathVariable int exploitId) {
+    service.deleteExploit(exploitId);
+  }
+
+  @PatchMapping("/exploits/{exploitId}/validate")
+  public void validateExploit(@PathVariable int exploitId) {
+    service.validateExploit(exploitId);
+  }
 
   @GetMapping("/attacks")
   public Iterable<Attack> readAllAttacks(){

@@ -76,6 +76,9 @@ DELETE {{baseUrl}}/servers/1
 ### Validate a server
 PATCH {{baseUrl}}/servers/1/validate
 
+### Get all exploits
+GET {{baseUrl}}/exploits
+
 ### Read all attacks
 GET {{baseUrl}}/attacks
 
