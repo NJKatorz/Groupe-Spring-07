@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface TargetsProxy {
 
   @GetMapping("/targets")
-  Iterable<Target> getAllTargets(@RequestParam(value = "minServers", required = false) int minServers,
-      @RequestParam(value = "minRevenue", required = false) int minRevenue);
+  Iterable<Target> getAllTargets(@RequestParam(required = false) int minServers,
+      @RequestParam(required = false) int minRevenue);
 
   @PostMapping("/targets")
   void createOne(@RequestBody Target target);

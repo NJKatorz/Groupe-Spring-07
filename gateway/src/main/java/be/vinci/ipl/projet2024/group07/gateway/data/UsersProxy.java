@@ -35,9 +35,6 @@ public interface UsersProxy {
   @PatchMapping("/users/{userId}/role")
   void updateUserRole(@PathVariable int userId, @RequestBody String newRole);
 
-  @PatchMapping("/auth/change-password")
-  void changePassword(@RequestBody Credentials credentials, @RequestParam String newPassword);
-
   @GetMapping("/exploits/author/{authorId}")
   Iterable<Exploit> getExploitsByAuthor(@PathVariable int authorId);
 }

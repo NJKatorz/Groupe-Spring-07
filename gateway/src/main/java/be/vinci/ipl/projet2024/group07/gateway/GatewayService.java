@@ -12,6 +12,7 @@ import be.vinci.ipl.projet2024.group07.gateway.exceptions.ConflictException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.NotFoundException;
 import be.vinci.ipl.projet2024.group07.gateway.exceptions.UnauthorizedException;
 import be.vinci.ipl.projet2024.group07.gateway.models.Attack;
+import be.vinci.ipl.projet2024.group07.gateway.models.ChangePassword;
 import be.vinci.ipl.projet2024.group07.gateway.models.Credentials;
 import be.vinci.ipl.projet2024.group07.gateway.models.Exploit;
 import be.vinci.ipl.projet2024.group07.gateway.models.Server;
@@ -56,9 +57,23 @@ public class GatewayService {
      }
   }
 
-  public String verify(String token) throws UnauthorizedException {
+  public String verifyToken(String token) throws UnauthorizedException {
     try {
-      return authenticationProxy.verify(token);
+      return authenticationProxy.verifyToken(token);
+    } catch (FeignException e) {
+      if (e.status() == 401) {
+        throw new UnauthorizedException();
+      }else{
+        throw e;
+      }
+    }
+  }
+
+  public boolean verifyUserIsAdmin(String token) throws UnauthorizedException {
+    try {
+      String authenticatedUserEmail = authenticationProxy.verifyToken(token);
+      User user = usersProxy.getUserByEmail(authenticatedUserEmail);
+      return user.getRole().equals("admin");
     } catch (FeignException e) {
       if (e.status() == 401) {
         throw new UnauthorizedException();
@@ -149,10 +164,10 @@ public class GatewayService {
     }
   }
 
-  public void updateUserPassword(Credentials userWithCredentials, String newPassword)
+  public void updateUserPassword(ChangePassword userWithNewPassword)
       throws BadRequestException, NotFoundException {
     try {
-      usersProxy.changePassword(userWithCredentials, newPassword);
+      authenticationProxy.changePassword(userWithNewPassword);
     } catch (FeignException e) {
       if (e.status() == 400) {
         throw new BadRequestException();
@@ -472,7 +487,7 @@ public class GatewayService {
     }
   }
 
-  public void lauchAttack(int attackId) throws NotFoundException {
+  public void launchAttack(int attackId) throws NotFoundException {
     try {
       attacksProxy.launchAttack(attackId);
     } catch (FeignException e) {
