@@ -5,4 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface TargetsRepository extends CrudRepository<Target, Integer> {
 
+  Iterable<Target> findAllByServersBetween(int min, int max);
 }
