@@ -1,4 +1,4 @@
-package be.vinci.ipl.projet2024.group07.targets.models;
+package be.vinci.ipl.projet2024.group07.servers.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,21 +16,12 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Entity(name = "targets")
 public class Target {
-  @Id @Column(nullable = false)
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
-  @Column(nullable = false)
   private String companyName;
-  @Column(nullable = false)
   private String domain;
-  @Column(nullable = false)
   private String location;
-  @Column(nullable = false)
   private int employees;
-  @Column(nullable = false)
   private int servers;
-  @Column(nullable = false)
   private int revenue;
 }
