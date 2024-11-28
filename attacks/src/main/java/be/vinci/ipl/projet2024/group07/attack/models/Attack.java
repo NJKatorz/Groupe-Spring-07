@@ -1,5 +1,9 @@
-package be.vinci.ipl.projet2024.group07.attack;
+package be.vinci.ipl.projet2024.group07.attack.models;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,17 +13,22 @@ import lombok.ToString;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity(name = "attacks")
 public class Attack {
-
+  @Id
+  @Column(nullable = false)
   private int id;
+  @Column(nullable = false)
   private int targetId;
-  private int serverId;
-  private int exploitId;
+  private Integer serverId;
+  private Integer exploitId;
+  @Column(nullable = false)
   private Status status;
   private String notes;
 
   public enum Status {
-    PlANIFIEE("planifiée"),
+    PLANIFIEE("planifiée"),
     EN_COURS("en cours"),
     TERMINEE("terminée"),
     ECHOUEE("échouée");

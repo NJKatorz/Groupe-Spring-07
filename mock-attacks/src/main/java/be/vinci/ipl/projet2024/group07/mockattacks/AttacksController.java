@@ -26,7 +26,7 @@ public class AttacksController {
     attack.setTargetId(54321);
     attack.setServerId(12345);
     attack.setExploitId(67890);
-    attack.setStatus(Status.PlANIFIEE);
+    attack.setStatus(Status.PLANIFIEE);
     attack.setNotes("Ceci est une note");
     return new ResponseEntity<>(attack, HttpStatus.OK);
   }
