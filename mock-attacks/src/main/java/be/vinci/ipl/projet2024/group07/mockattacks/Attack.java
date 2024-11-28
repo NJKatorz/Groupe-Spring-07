@@ -13,13 +13,13 @@ public class Attack {
 
     private int id;
     private int targetId;
-    private int serverId;
-    private int exploitId;
+    private Integer serverId;
+    private Integer exploitId;
     private Status status;
     private String notes;
 
     public enum Status {
-        PlANIFIEE("planifiée"),
+        PLANIFIEE("planifiée"),
         EN_COURS("en cours"),
         TERMINEE("terminée"),
         ECHOUEE("échouée");
