@@ -5,6 +5,8 @@ import be.vinci.ipl.projet2024.group07.servers.models.Target;
 import be.vinci.ipl.projet2024.group07.servers.repositories.AttackProxy;
 import be.vinci.ipl.projet2024.group07.servers.repositories.ServerRepository;
 import be.vinci.ipl.projet2024.group07.servers.repositories.TargetProxy;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ public class ServerService {
     if (targetProxy.readOne(newServer.getTargetId()) == null) {
       return null;
     }
+    targetProxy.increaseServers(newServer.getTargetId());
     return repository.save(newServer);
   }
 
@@ -40,8 +43,14 @@ public class ServerService {
     repository.save(updatedServer);
   }
 
-  public void deleteOne(int serverId) {
+  public Server deleteOne(int serverId) {
+    Server server = repository.findById(serverId).orElse(null);
+    if (server == null) {
+      return null;
+    }
+    targetProxy.decreaseServers(server.getTargetId());
     repository.deleteById(serverId);
+    return server;
   }
 
   public void validateServer(Server server) {

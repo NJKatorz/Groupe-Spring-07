@@ -34,6 +34,7 @@ public class ServerController {
         || newServer.getTargetId() == 0) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
     newServer.setValidated(false);
     Server server = serverService.createOne(newServer);
     if (server == null) {
@@ -46,14 +47,14 @@ public class ServerController {
   @PutMapping("/servers/{serverId}")
   public ResponseEntity<Void> updateOne(@PathVariable int serverId, @RequestBody Server updatedServer) {
     if (updatedServer.getIpAdress()==null || updatedServer.getServerType()==null || updatedServer.getTechnology()==null
-        ) {
+       || serverId != updatedServer.getId() ) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     Server server = serverService.getOne(serverId);
     if (server == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    if (server.getTargetId() !=  updatedServer.getTargetId() || server.isValidated() != updatedServer.isValidated() || server.getId() != serverId) {
+    if (server.getTargetId() !=  updatedServer.getTargetId() || server.isValidated() != updatedServer.isValidated()) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -65,11 +66,11 @@ public class ServerController {
 
   @DeleteMapping("/servers/{serverId}")
   public ResponseEntity<Void> deleteOne(@PathVariable int serverId) {
-    Server server = serverService.getOne(serverId);
+    Server server =serverService.deleteOne(serverId);
     if (server == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    serverService.deleteOne(serverId);
+
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
