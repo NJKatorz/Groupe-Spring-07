@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>be.vinci.ipl.projet2024.group07</groupId>
-	<artifactId>Attack</artifactId>
+	<artifactId>attacks</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Attack</name>
 	<description>Attack</description>
@@ -63,7 +63,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>org.apache.httpcomponents.core5</groupId>
+      <artifactId>httpcore5</artifactId>
+    </dependency>
+  </dependencies>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
