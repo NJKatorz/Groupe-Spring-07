@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.stereotype.Service;
 
+@Service
 public class TargetsService {
     private TargetsRepository targetsRepository;
     private final ServersProxy serversProxy;
@@ -31,7 +33,14 @@ public class TargetsService {
     }
 
     public Iterable<Target> getAllTargets(Integer minServers, Integer maxServers) {
-        return targetsRepository.findAll();
+        int min = 0;
+        int max = Integer.MAX_VALUE;
+        if (minServers != null)
+            min = minServers;
+        if (maxServers != null)
+            max = maxServers;
+
+        return targetsRepository.findAllByServersBetween(min, max);
     }
 
     public void deleteTarget(int id) {

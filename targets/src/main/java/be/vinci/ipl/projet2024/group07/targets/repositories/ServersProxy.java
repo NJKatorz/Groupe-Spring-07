@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @Repository
-@FeignClient(name = "users")
+@FeignClient(name = "servers")
 public interface ServersProxy {
 
   @GetMapping("/servers/target/{targetId}")
