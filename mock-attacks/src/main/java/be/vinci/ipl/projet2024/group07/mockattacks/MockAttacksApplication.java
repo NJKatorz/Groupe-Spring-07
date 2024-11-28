@@ -8,7 +8,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableDiscoveryClient
 @EnableFeignClients
 @SpringBootApplication
-@EnableFeignClients
 public class MockAttacksApplication {
 
 	public static void main(String[] args) {

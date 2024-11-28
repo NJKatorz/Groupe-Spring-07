@@ -48,7 +48,7 @@ Content-Type: application/json
 
 {
   "name": "Marc Evans",
-  "email": "marc.evans@example.com",
+  "email": "",
   "password": "admin123"
 }
 
@@ -59,7 +59,6 @@ Content-Type: application/json
 {
   "name": "Marc Evans",
   "email": "marc.evans@example.com",
-  "role": "admin",
   "password": "admin123"
 }
 

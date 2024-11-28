@@ -11,6 +11,7 @@ import be.vinci.ipl.projet2024.group07.gateway.models.Exploit;
 import be.vinci.ipl.projet2024.group07.gateway.models.Server;
 import be.vinci.ipl.projet2024.group07.gateway.models.Target;
 import be.vinci.ipl.projet2024.group07.gateway.models.User;
+import be.vinci.ipl.projet2024.group07.gateway.models.UserWithCredentials;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,7 +36,7 @@ public class GatewayController {
   }
 
   @GetMapping("/users")
-  public ResponseEntity<User> readUserByEmail(@RequestParam(value = "email") String email,
+  public ResponseEntity<User> readUserByEmail(@RequestParam String email,
       @RequestHeader("Authorization") String token) {
     try {
       service.verifyToken(token);
@@ -50,14 +51,14 @@ public class GatewayController {
   }
 
   @PostMapping("/users")
-  public ResponseEntity<Void> createUser(@RequestBody Credentials userWithCredentials) {
+  public ResponseEntity<Void> createUser(@RequestBody UserWithCredentials userWithCredentials) {
     try {
       service.createUser(userWithCredentials);
       return new ResponseEntity<>(HttpStatus.CREATED);
     } catch (BadRequestException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user data");
     } catch (ConflictException e) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT);
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
     }
   }
 

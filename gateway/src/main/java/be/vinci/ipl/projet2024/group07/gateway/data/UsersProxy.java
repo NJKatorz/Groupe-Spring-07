@@ -3,6 +3,7 @@ package be.vinci.ipl.projet2024.group07.gateway.data;
 import be.vinci.ipl.projet2024.group07.gateway.models.Credentials;
 import be.vinci.ipl.projet2024.group07.gateway.models.Exploit;
 import be.vinci.ipl.projet2024.group07.gateway.models.User;
+import be.vinci.ipl.projet2024.group07.gateway.models.UserWithCredentials;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +22,7 @@ public interface UsersProxy {
   User getUserByEmail(@RequestParam String email);
 
   @PostMapping("/users")
-  User createOne(@RequestBody Credentials credentials);
+  User createOne(@RequestBody UserWithCredentials credentials);
 
   @GetMapping("/users/{userId}")
   User readOneByUserId(@PathVariable int userId);

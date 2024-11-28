@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Repository
-@FeignClient(name = "authentication")
+@FeignClient(name = "authentications")
 public interface AuthenticationProxy {
 
   @PostMapping("/auth/login")

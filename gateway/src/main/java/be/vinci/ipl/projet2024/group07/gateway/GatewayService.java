@@ -18,6 +18,7 @@ import be.vinci.ipl.projet2024.group07.gateway.models.Exploit;
 import be.vinci.ipl.projet2024.group07.gateway.models.Server;
 import be.vinci.ipl.projet2024.group07.gateway.models.Target;
 import be.vinci.ipl.projet2024.group07.gateway.models.User;
+import be.vinci.ipl.projet2024.group07.gateway.models.UserWithCredentials;
 import feign.FeignException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,7 +96,7 @@ public class GatewayService {
     }
   }
 
-  public void createUser(Credentials userWithCredentials)
+  public void createUser(UserWithCredentials userWithCredentials)
       throws BadRequestException, ConflictException {
     try {
       usersProxy.createOne(userWithCredentials);
