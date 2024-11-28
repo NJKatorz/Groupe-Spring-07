@@ -6,6 +6,7 @@ import be.vinci.ipl.projet2024.group07.servers.repositories.AttackProxy;
 import be.vinci.ipl.projet2024.group07.servers.repositories.ServerRepository;
 import be.vinci.ipl.projet2024.group07.servers.repositories.TargetProxy;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -14,6 +15,7 @@ public class ServerService {
   private final ServerRepository repository;
   private final TargetProxy targetProxy;
   private final AttackProxy attackProxy;
+
 
   public ServerService(ServerRepository repository, TargetProxy targetProxy,
       AttackProxy attackProxy) {

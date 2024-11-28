@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Repository
 @FeignClient(name = "targets")
 public interface TargetProxy {
+
   @GetMapping("/targets/{targetId}")
   Target readOne(@PathVariable int targetId);
 }
