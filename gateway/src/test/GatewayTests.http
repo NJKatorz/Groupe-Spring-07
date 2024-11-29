@@ -126,7 +126,7 @@ GET {{baseUrl}}/users/1
 Authorization: {{token}}
 
 ### Read one user by his id 2 (200)
-GET {{baseUrl}}/users/1
+GET {{baseUrl}}/users/2
 Authorization: {{token}}
 
 ### Read one user by his id (401 : unauthenticated user)
@@ -140,7 +140,7 @@ Authorization: {{token}}
 DELETE {{baseUrl}}/users/1
 
 ### Delete one user by his id (204)
-DELETE {{baseUrl}}/users/1
+DELETE {{baseUrl}}/users/2
 Authorization: {{token}}
 
 ### Delete one user by his id (404 : not found user)
@@ -161,11 +161,11 @@ Content-Type: text/plain
 Joe Doe
 
 ### Update user's name by his id (204)
-PATCH {{baseUrl}}/users/1/name
-Content-Type: text/plain
+PATCH {{baseUrl}}/users/2/name
+Content-Type: application/json
 Authorization: {{token}}
 
-Joe Doe
+Joe Do
 
 ### Update user's name by his id with the administrator (204)
 PATCH {{baseUrl}}/users/1/name
@@ -223,14 +223,14 @@ Authorization: {{token2}}
 admin
 
 ### Update user's password by his id (401 : unauthenticated user)
-PATCH {{baseUrl}}/users/1/password
-Content-Type: text/plain
+PATCH {{baseUrl}}/users/2/password
+Content-Type: application/json
 
 user456
 
 ### Update user's password by his id (204)
-PATCH {{baseUrl}}/users/1/password
-Content-Type: text/plain
+PATCH {{baseUrl}}/users/2/password
+Content-Type: application/json
 Authorization: {{token}}
 
 user456
@@ -257,10 +257,10 @@ Authorization: {{token2}}
 user123
 
 ### Read all user's exploits (401 : unauthenticated user)
-GET {{baseUrl}}/users/1/exploits
+GET {{baseUrl}}/users/2/exploits
 
 ### Read all user's exploits (200)
-GET {{baseUrl}}/users/1/exploits
+GET {{baseUrl}}/users/2/exploits
 Authorization: {{token}}
 
 ### Read all targets (401 : unauthenticated user)
