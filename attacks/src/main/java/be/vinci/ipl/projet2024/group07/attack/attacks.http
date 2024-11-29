@@ -21,24 +21,24 @@ DELETE http://localhost:8084/attack/1
 
 
 ### Mise à jour des notes d'une attaque
-PATCH http://localhost:8084/attack/2/notes
+PATCH http://localhost:8084/attack/1/notes
 Content-Type: application/json
 
 Nouvelle note pour l'attaque
 
 
 ### Mise à jour du serveur d'une attaque
-PATCH http://localhost:8084/attack/2/server
+PATCH http://localhost:8084/attack/1/server
 Content-Type: application/json
 
-5
+1
 
 
 ### Mise à jour de l'exploit d'une attaque
-PATCH http://localhost:8084/attack/2/exploit
+PATCH http://localhost:8084/attack/1/exploit
 Content-Type: application/json
 
-2
+1
 
 
 ### Lancement d'une attaque
@@ -66,4 +66,4 @@ DELETE http://localhost:8084/attack/servers/5
 
 
 ### Suppression des attaques liées à un exploit
-DELETE http://localhost:8084/attack/exploits/2
+DELETE http://localhost:8084/attack/exploits/1

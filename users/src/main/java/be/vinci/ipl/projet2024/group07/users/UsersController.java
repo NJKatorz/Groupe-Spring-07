@@ -66,10 +66,8 @@ public class UsersController {
     return user;
   }
 
-
-
   @DeleteMapping("/{id}")
-  public void deleteOne(@PathVariable Integer id) {
+  public void deleteOne(@PathVariable int id) {
     boolean deleted = service.deleteOne(id);
     if (!deleted) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
   }
