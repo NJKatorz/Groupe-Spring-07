@@ -133,7 +133,7 @@ Content-Type: application/json
 }
 
 ### Delete one
-DELETE http://localhost:8082/targets/3
+DELETE http://localhost:8082/targets/1
 
 ### Delete one that doesn't exists
 DELETE http://localhost:8082/targets/1234
