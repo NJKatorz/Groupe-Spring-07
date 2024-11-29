@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "servers")
 public interface ServerProxy {
 
-  @GetMapping("/server/{serverId}")
-  public Server readOne(@PathVariable int serverId);
+  @GetMapping("/servers/{serverId}")
+  Server readOne(@PathVariable int serverId);
 
 
 }

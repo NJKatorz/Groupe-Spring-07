@@ -6,8 +6,9 @@ import be.vinci.ipl.projet2024.group07.attack.repositories.AttackRepository;
 import be.vinci.ipl.projet2024.group07.attack.repositories.ExploitProxy;
 import be.vinci.ipl.projet2024.group07.attack.repositories.ServerProxy;
 import be.vinci.ipl.projet2024.group07.attack.repositories.TargetProxy;
-import java.util.Optional;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AttackService {
 
   private final AttackRepository attackRepository;
@@ -32,14 +33,13 @@ public class AttackService {
     return attackRepository.findById(id).orElse(null);
   }
 
-  public void createOne (int targetId){
-    if(targetProxy.readOne(targetId)==null)
+  public void createOne (Attack attack){
+    if(targetProxy.readOne(attack.getTargetId())==null)
       throw new IllegalArgumentException("Les données de l'attaque sont manquantes ou incorrectes");
-    Attack attack = new Attack();
-    attack.setTargetId(targetId);
     attack.setStatus(Status.PLANIFIEE);
     attackRepository.save(attack);
   }
+
 
   public void deleteOne(int id){
     if(!attackRepository.existsById(id))
@@ -49,8 +49,6 @@ public class AttackService {
 
   public void updateNotes(String newNotes, int id){
     Attack attack = readOne(id);
-    if(attack==null)
-      throw new IllegalArgumentException("Aucune attaque trouvée pour cet ID");
     attack.setNotes(newNotes);
     attackRepository.save(attack);
   }
@@ -64,10 +62,10 @@ public class AttackService {
   }
 
   public void updateExploit(int exploitId, int id){
-    if(exploitProxy.readOne(exploitId)==null || !exploitProxy.readOne(exploitId).isValidated())
+    if(exploitProxy.getExploit(exploitId)==null || !exploitProxy.getExploit(exploitId).isValidated())
       throw new IllegalArgumentException("Exploit non existant ou validé");
     Attack attack = readOne(id);
-    attack.setServerId(exploitId);
+    attack.setExploitId(exploitId);
     attackRepository.save(attack);
   }
 
@@ -90,7 +88,7 @@ public class AttackService {
   public boolean deleteServers(int serverId){
     Iterable<Attack> attacks = readAll();
     for (Attack attack : attacks) {
-      if(attack.getServerId()==serverId){
+      if(attack.getServerId()!=null && attack.getServerId().intValue()==serverId){
         deleteOne(attack.getId());
       }
     }
@@ -100,7 +98,7 @@ public class AttackService {
   public boolean deleteExploits(int exploitId){
     Iterable<Attack> attacks = readAll();
     for (Attack attack : attacks) {
-      if(attack.getExploitId()==exploitId){
+      if(attack.getExploitId()!=null && attack.getExploitId().intValue()==exploitId){
         deleteOne(attack.getId());
       }
     }

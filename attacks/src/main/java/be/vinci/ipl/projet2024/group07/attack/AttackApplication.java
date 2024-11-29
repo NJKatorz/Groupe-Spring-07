@@ -13,5 +13,4 @@ public class AttackApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AttackApplication.class, args);
 	}
-
 }

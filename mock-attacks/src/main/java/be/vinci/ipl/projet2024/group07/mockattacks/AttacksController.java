@@ -20,7 +20,7 @@ public class AttacksController {
   }
 
   @GetMapping("/attacks/{attackId}")
-  public ResponseEntity<Attack> readOne(@PathVariable int attackId) {
+  public Attack readOne(@PathVariable int attackId) {
     Attack attack = new Attack();
     attack.setId(attackId);
     attack.setTargetId(54321);
@@ -28,7 +28,7 @@ public class AttacksController {
     attack.setExploitId(67890);
     attack.setStatus(Status.PLANIFIEE);
     attack.setNotes("Ceci est une note");
-    return new ResponseEntity<>(attack, HttpStatus.OK);
+    return attack;
   }
 
   @DeleteMapping("/attacks/{attackId}")

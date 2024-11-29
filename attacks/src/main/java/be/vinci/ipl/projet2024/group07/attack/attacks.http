@@ -1,7 +1,7 @@
 ### Récupération de toutes les attaques
 GET http://localhost:8084/attack
 
----
+----
 
 ### Création d'une attaque
 POST http://localhost:8084/attack
@@ -11,72 +11,59 @@ Content-Type: application/json
   "targetId": 2
 }
 
----
 
 ### Lecture d'une attaque par ID
-GET http://localhost:8084/attack/12345
+GET http://localhost:8084/attack/1
 
----
 
 ### Suppression d'une attaque par ID
-DELETE http://localhost:8084/attack/12345
+DELETE http://localhost:8084/attack/1
 
----
 
 ### Mise à jour des notes d'une attaque
-PATCH http://localhost:8084/attack/12345/notes
+PATCH http://localhost:8084/attack/2/notes
 Content-Type: application/json
 
-{
-  "notes": "Nouvelle note pour l'attaque."
-}
+Nouvelle note pour l'attaque
 
----
 
 ### Mise à jour du serveur d'une attaque
-PATCH http://localhost:8084/attack/12345/server
+PATCH http://localhost:8084/attack/2/server
 Content-Type: application/json
 
-{
-  "serverId": 67890
-}
+5
 
----
 
 ### Mise à jour de l'exploit d'une attaque
-PATCH http://localhost:8084/attack/12345/exploit
+PATCH http://localhost:8084/attack/2/exploit
 Content-Type: application/json
 
-{
-  "exploitId": 98765
-}
+2
 
----
 
 ### Lancement d'une attaque
-POST http://localhost:8084/attack/12345/launch
+POST http://localhost:8084/attack/2/launch
 
----
+
 
 ### Mise à jour du résultat d'une attaque
-POST http://localhost:8084/attack/12345/result
+POST http://localhost:8084/attack/2/result
 Content-Type: application/json
 
 {
   "status": "TERMINEE"
 }
 
----
 
 ### Suppression des attaques liées à une cible
-DELETE http://localhost:8084/attack/targets/54321
+DELETE http://localhost:8084/attack/targets/2
 
----
+
 
 ### Suppression des attaques liées à un serveur
-DELETE http://localhost:8084/attack/servers/67890
+DELETE http://localhost:8084/attack/servers/5
 
----
+
 
 ### Suppression des attaques liées à un exploit
-DELETE http://localhost:8084/attack/exploits/98765
+DELETE http://localhost:8084/attack/exploits/2

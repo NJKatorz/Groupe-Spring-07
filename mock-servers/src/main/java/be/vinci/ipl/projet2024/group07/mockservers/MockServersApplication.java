@@ -10,7 +10,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 @SpringBootApplication
 public class MockServersApplication {
-
   public static void main(String[] args) {
     SpringApplication.run(MockServersApplication.class, args);
   }

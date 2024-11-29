@@ -8,19 +8,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-
 public class ServersController {
 
   @GetMapping("/servers/{serverId}")
-  public ResponseEntity<Server> readOne(@PathVariable int serverId) {
+  public Server readOne(@PathVariable int serverId) {
     Server server = new Server();
     server.setId(serverId);
     server.setIpAddress("192.168.1.1");
     server.setTargetId(54321);
     server.setServerType("Web");
     server.setTechnology("Apache");
-    server.setValidated(false);
-    return new ResponseEntity<>(server, HttpStatus.OK);
+    server.setValidated(true);
+    return server;
   }
 
   @PostMapping("/servers")

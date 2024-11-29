@@ -30,10 +30,10 @@ public class AttackControler {
   }
 
   @PostMapping("/attack")
-  public ResponseEntity<String> createOne(@RequestBody int targetId){
+  public ResponseEntity<String> createOne(@RequestBody Attack attack){
     try{
-      attackService.createOne(targetId);
-      return new ResponseEntity<>(HttpStatus.CREATED);
+      attackService.createOne(attack);
+      return ResponseEntity.status(HttpStatus.CREATED).body("L'attaque a été créée");
     }
     catch (Exception e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -48,31 +48,30 @@ public class AttackControler {
   }
 
   @DeleteMapping("/attack/{attackId}")
-  public void deleteOne(@PathVariable int attackId){
-    try{
+  public ResponseEntity<Void> deleteOne(@PathVariable int attackId){
+      if(attackService.readOne(attackId) == null)
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucune attaque trouvée pour cet ID");
       attackService.deleteOne(attackId);
-    }
-    catch (Exception e){
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-    }
+      return ResponseEntity.noContent().build(); // 204 No Content
   }
 
   @PatchMapping("/attack/{attackId}/notes")
-  public void updateNotes(@PathVariable int attackId, @RequestBody String notes){
-    try{
-      attackService.updateNotes(notes, attackId);
-    }
-    catch (Exception e){
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-    }
+  public ResponseEntity<Void> updateNotes(@PathVariable int attackId, @RequestBody String notes){
+    Attack attack = attackService.readOne(attackId);
+    if (attack == null)
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucune attaque trouvée pour cet ID");
+    attackService.updateNotes(notes, attackId);
+    return ResponseEntity.noContent().build();
+
   }
 
   @PatchMapping("/attack/{attackId}/server")
-  public void updateServer(@PathVariable int attackId,@RequestBody int serverId){
+  public ResponseEntity<Void> updateServer(@PathVariable int attackId,@RequestBody int serverId){
     Attack attack = attackService.readOne(attackId);
     if (attack == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attaque non trouvé");
     try{
       attackService.updateServer(serverId, attackId);
+      return ResponseEntity.noContent().build();
     }
     catch (Exception e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -80,11 +79,12 @@ public class AttackControler {
   }
 
   @PatchMapping("/attack/{attackId}/exploit")
-  public void updateExploit(@PathVariable int attackId, @RequestBody int exploitId){
+  public ResponseEntity<Void> updateExploit(@PathVariable int attackId, @RequestBody int exploitId){
     Attack attack = attackService.readOne(attackId);
     if (attack == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attaque non trouvé");
     try{
       attackService.updateExploit(exploitId, attackId);
+      return ResponseEntity.noContent().build();
     }
     catch (Exception e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -92,39 +92,44 @@ public class AttackControler {
   }
 
   @PostMapping("/attack/{attackId}/launch")
-  public void launchAttack(@PathVariable int attackId){
+  public ResponseEntity<Void> launchAttack(@PathVariable int attackId){
     Attack attack = attackService.readOne(attackId);
     if (attack == null)
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attaque non trouvé");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucune attaque trouvée pour cet ID");
     if(attack.getStatus() != Status.PLANIFIEE || attack.getServerId()==null || attack.getExploitId()==null)
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Serveur ou exploit non défini ou attaque déjà lancée");
     attackService.updateStatus(Status.EN_COURS, attackId);
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/attack/{attackId}/result")
-  public void resultAttack(@PathVariable int attackId, Status status){
+  public ResponseEntity<Void> resultAttack(@PathVariable int attackId, @RequestBody Status status){
     Attack attack = attackService.readOne(attackId);
     if (attack == null)
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attaque non trouvé");
     if(attack.getStatus() != Status.EN_COURS || (status != Status.TERMINEE && status != Status.ECHOUEE))
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'attaque n'était pas en cours, ou le résultat fourni est incorrect");
     attackService.updateStatus(status, attackId);
+    return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/attack/targets/{targetId}")
-  public void deleteTargets(@PathVariable int targetId){
+  public ResponseEntity<Void> deleteTargets(@PathVariable int targetId){
     attackService.deleteTargets(targetId);
+    return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/attack/servers/{serverId}")
-  public void deleteServers(@PathVariable int serverId){
+  public ResponseEntity<Void> deleteServers(@PathVariable int serverId){
     attackService.deleteServers(serverId);
+    return ResponseEntity.noContent().build();
   }
 
 
   @DeleteMapping("/attack/exploits/{exploitId}")
-  public void deleteExploits(@PathVariable int exploitId){
+  public ResponseEntity<Void> deleteExploits(@PathVariable int exploitId){
     attackService.deleteExploits(exploitId);
+    return ResponseEntity.noContent().build();
   }
 
 

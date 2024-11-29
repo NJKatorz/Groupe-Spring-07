@@ -49,9 +49,9 @@ public class TargetsService {
 
     public boolean deleteTarget(int id) {
         if (!targetsRepository.existsById(id)) return false;
-        targetsRepository.deleteById(id);
         serversProxy.deleteByTarget(id);
         attacksProxy.deleteTargets(id);
+        targetsRepository.deleteById(id);
         return true;
     }
 
@@ -61,8 +61,7 @@ public class TargetsService {
         return true;
     }
 
-    public Iterable<String> getIpColocated() {
-        System.out.println("test");
+    public Iterable<Map<String, List<Target>>> getIpColocated() {
         Map<String, Set<Target>> dicoIp = new HashMap<>();
         for (Target target : targetsRepository.findAll()) {
             Iterable<Server> servers = serversProxy.readByTarget(target.getId());
@@ -75,10 +74,12 @@ public class TargetsService {
 
         System.out.printf("dicoIp: %s\n", dicoIp);
 
-        ArrayList<String> allIp = new ArrayList<>();
+        ArrayList<Map<String, List<Target>>> allIp = new ArrayList<>();
         for (String ip : dicoIp.keySet()) {
             if (dicoIp.get(ip).size() > 1) {
-                allIp.add(ip);
+                Map<String, List<Target>> ipMap = new HashMap<>();
+                ipMap.put(ip, new ArrayList<>(dicoIp.get(ip)));
+                allIp.add(ipMap);
             }
         }
         return allIp;
