@@ -18,6 +18,13 @@ Content-Type: application/json
   "targetId": 1
 }
 
+### Récupération de toutes les attaques
+GET http://localhost:8084/attack
+
+### Read all
+GET http://localhost:8082/targets
+
+
 
 ### Récupération de toutes les attaques
 GET http://localhost:8084/attack
@@ -34,6 +41,7 @@ Content-Type: application/json
   "serverType": "web",
   "technology": "Apache"
 }
+//faire 2 fois  pour avoir 2 serveurs
 
 ### Test lecture d'un serveur (par ID)
 GET http://localhost:8083/servers/2
@@ -65,4 +73,4 @@ PATCH http://localhost:8083/servers/2/validate
 GET http://localhost:8083/servers/target/1
 
 ### Test suppression de serveurs associés à une cible
-DELETE http://localhost:8083/servers/target/54321
+DELETE http://localhost:8083/servers/target/1
