@@ -27,7 +27,7 @@ public class Attack {
   private Integer serverId;
   private Integer exploitId;
   @Column(nullable = false)
-  private Status status;
+  private String status;
   private String notes;
 
   public enum Status {
