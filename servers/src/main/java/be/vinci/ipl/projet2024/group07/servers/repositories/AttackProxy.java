@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "attacks")
 public interface AttackProxy {
 
+
+  /**
+   * Supprime les attaques liées à un serveur.
+   * @param serverId l'ID du serveur.
+   */
   @DeleteMapping("/attacks/servers/{serverId}")
   @Transactional
   void deleteByServer(@PathVariable int serverId);

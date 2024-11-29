@@ -12,15 +12,28 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "targets")
 public interface TargetProxy {
 
+  /**
+   * Récupère une cible en fonction de son ID.
+   * @param targetId l'ID de la cible à récupérer.
+   * @return la cible correspondante.
+   */
   @GetMapping("/targets/{targetId}")
   Target readOne(@PathVariable int targetId);
 
 
+  /**
+   * Augmente le nombre de serveurs d'une cible.
+   * @param targetId l'ID de la cible.
+   */
   @PatchMapping("/targets/{targetId}/increase-servers")
   @Transactional
   void increaseServers(@PathVariable int targetId);//erreur avec Patch mais pas Put
 
 
+  /**
+   * Diminue le nombre de serveurs d'une cible.
+   * @param targetId l'ID de la cible.
+   */
   @PatchMapping("/targets/{targetId}/decrease-servers")
   @Transactional
   void decreaseServers(@PathVariable int targetId);//erreur avec Patch mais pas Put

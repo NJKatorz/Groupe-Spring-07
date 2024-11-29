@@ -37,7 +37,7 @@ public class AttackControler {
   /**
    * Crée une nouvelle attaque.
    * @param attack l'attaque à créer.
-   * @return une réponse contenant l'attaque crée.
+   * @return une réponse contenant l'attaque créée.
    */
   @PostMapping("/attack")
   public ResponseEntity<Attack> createOne(@RequestBody Attack attack){
@@ -114,7 +114,7 @@ public class AttackControler {
 
   /**
    * Met à jour l'exploit d'une attaque.
-   * @param attackId l'ID de l'
+   * @param attackId l'ID de l'attaque à mettre à jour.
    * @param exploitId le nouvel ID de l'exploit.
    * @return une réponse vide.
    */
@@ -133,7 +133,7 @@ public class AttackControler {
 
   /**
    * Lance une attaque.
-   * @param attackId l'ID de
+   * @param attackId l'ID de l'attaque à lancer.
    * @return une réponse vide.
    */
   @PostMapping("/attack/{attackId}/launch")
@@ -149,7 +149,7 @@ public class AttackControler {
 
   /**
    * Met à jour le statut d'une attaque.
-   * @param attackId l'ID de l'
+   * @param attackId l'ID de l'attaque à mettre à jour.
    * @param status le nouveau statut de l'attaque.
    * @return une réponse vide.
    */
