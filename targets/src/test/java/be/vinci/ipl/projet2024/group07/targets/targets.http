@@ -2,13 +2,13 @@
 GET http://localhost:8082/targets
 
 ### Read all with all the filters
-GET http://localhost:8082/targets?minServers=1&maxServers=2
+GET http://localhost:8082/targets?minServers=1&minRevenue=10000
 
 ### Read all with the min filter
 GET http://localhost:8082/targets?minServers=1
 
 ### Read all with the max filter
-GET http://localhost:8082/targets?maxServers=2
+GET http://localhost:8082/targets?minRevenue=10000
 
 ### Create one with every field needed
 POST http://localhost:8082/targets
