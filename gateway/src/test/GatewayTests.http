@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:8080
 
 ### Connect an user (400: missing fields)
-POST {{baseUrl}}/auth/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 > {% client.global.set("token", response.body) %}
 
 ### Connect an user (400 : failed authentication user does not exist)
-POST {{baseUrl}}/auth/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
@@ -63,7 +63,7 @@ Content-Type: application/json
 }
 
 ### Connect an user (401 : wrong password)
-POST {{baseUrl}}/auth/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
@@ -74,7 +74,7 @@ Content-Type: application/json
 > {% client.global.set("token", response.body) %}
 
 ### Connect an user (400 : missing fields)
-POST {{baseUrl}}/auth/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
@@ -85,7 +85,7 @@ Content-Type: application/json
 > {% client.global.set("token", response.body) %}
 
 ### Connect an user (200)
-POST {{baseUrl}}/auth/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
@@ -96,7 +96,7 @@ Content-Type: application/json
 > {% client.global.set("token", response.body) %}
 
 ### Connect an administrator (200)
-POST {{baseUrl}}/auth/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
