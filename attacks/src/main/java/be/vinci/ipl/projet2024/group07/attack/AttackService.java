@@ -85,24 +85,22 @@ public class AttackService {
     return true;
   }
 
-  public boolean deleteServers(int serverId){
+  public void deleteServers(int serverId){
     Iterable<Attack> attacks = readAll();
     for (Attack attack : attacks) {
       if(attack.getServerId()!=null && attack.getServerId().intValue()==serverId){
         deleteOne(attack.getId());
       }
     }
-    return true;
   }
 
-  public boolean deleteExploits(int exploitId){
+  public void deleteExploits(int exploitId){
     Iterable<Attack> attacks = readAll();
     for (Attack attack : attacks) {
       if(attack.getExploitId()!=null && attack.getExploitId().intValue()==exploitId){
         deleteOne(attack.getId());
       }
     }
-    return true;
   }
 
 }
