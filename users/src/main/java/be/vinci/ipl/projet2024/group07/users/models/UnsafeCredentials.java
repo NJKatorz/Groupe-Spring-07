@@ -20,7 +20,7 @@ public class UnsafeCredentials {
   }
 
   public User toUser() {
-    return new User(0, name,email, password, "user");
+    return new User(0, name,email, "user");
   }
 
   public boolean invalid() {

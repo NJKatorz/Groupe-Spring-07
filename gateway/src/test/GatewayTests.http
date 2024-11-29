@@ -100,7 +100,7 @@ POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
-  "email": "marc.evans@example.com",
+  "email": "admin@gmail.com",
   "password": "admin123"
 }
 
@@ -113,11 +113,19 @@ GET {{baseUrl}}/users?email=john.doe@example.com
 GET {{baseUrl}}/users?email=john.doe@example.com
 Authorization: {{token}}
 
+### Read another user by his email (200)
+GET {{baseUrl}}/users?email=admin@gmail.com
+Authorization: {{token}}
+
 ### Read one user by his email (404 : not found user )
 GET {{baseUrl}}/users?email=nath@gmail.com
 Authorization: {{token}}
 
-### Read one user by his id (200)
+### Read one user by his id 1 (200)
+GET {{baseUrl}}/users/1
+Authorization: {{token}}
+
+### Read one user by his id 2 (200)
 GET {{baseUrl}}/users/1
 Authorization: {{token}}
 
