@@ -4,26 +4,27 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserWithCredentials {
+public class UnsafeCredentials {
   private int id;
   private String name;
   private String email;
   private String password;
 
-  public User toUser() {
-    return new User(0, name, email, "user");
+  public SafeCredentials makeSafe(String hashedPassword) {
+    return new SafeCredentials(email, hashedPassword);
   }
 
-  public Credentials toCredentials() {
-    return new Credentials(email, password);
+  public User toUser() {
+    return new User(0, name,email, password, "user");
   }
 
   public boolean invalid() {
-    return name == null || name.isBlank() ||
-        email == null || email.isBlank() ||
+    return email == null || email.isBlank() ||
         password == null || password.isBlank();
   }
 }

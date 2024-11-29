@@ -33,9 +33,10 @@ Content-Type: application/json
 DELETE http://localhost:8082/targets/1
 
 ### Increase servers
-PATCH http://localhost:8082/targets/2/increase-servers
+PATCH http://localhost:8082/targets/1/increase-servers
 
 ### Decrease servers
-PATCH http://localhost:8082/targets/2/decrease-servers
+PATCH http://localhost:8082/targets/1/decrease-servers
 
 ### Get colocated targets
+GET http://localhost:8082/targets/colocated

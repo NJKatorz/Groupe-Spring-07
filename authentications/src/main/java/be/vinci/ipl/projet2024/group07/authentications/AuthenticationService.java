@@ -3,6 +3,7 @@ package be.vinci.ipl.projet2024.group07.authentications;
 import be.vinci.ipl.projet2024.group07.authentications.models.ChangePassword;
 import be.vinci.ipl.projet2024.group07.authentications.models.SafeCredentials;
 import be.vinci.ipl.projet2024.group07.authentications.models.UnsafeCredentials;
+import be.vinci.ipl.projet2024.group07.authentications.repositories.AuthenticationRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
