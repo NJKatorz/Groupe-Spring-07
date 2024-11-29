@@ -39,6 +39,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.github.openfeign/feign-hc5 -->
+		<dependency>
+			<artifactId>feign-hc5</artifactId>
+			<groupId>io.github.openfeign</groupId>
+			<version>13.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>

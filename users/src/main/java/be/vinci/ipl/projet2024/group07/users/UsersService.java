@@ -69,7 +69,6 @@ public class UsersService {
   public boolean deleteOne(int id) {
     if (!repository.existsById(id)) return false;
 
-
     User findUser = repository.findById(id).orElse(null);
     if (findUser==null) return false;
     exploitProxy.delete(id);
