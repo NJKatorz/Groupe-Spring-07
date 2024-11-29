@@ -1,6 +1,7 @@
 ### Récupération de toutes les attaques
 GET http://localhost:8084/attack
 
+----
 
 ### Création d'une attaque
 POST http://localhost:8084/attack

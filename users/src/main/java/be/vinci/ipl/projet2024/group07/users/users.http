@@ -1,5 +1,5 @@
 ### Création d'un utilisateur
-POST http://localhost:9005/users
+POST http://localhost:8085e/users
 Content-Type: application/json
 
 {
@@ -11,12 +11,12 @@ Content-Type: application/json
 ---
 
 ### Lecture d'un utilisateur par ID
-GET http://localhost:9005/users/1
+GET http://localhost:8085/users/1
 
 ---
 
 ### Mise à jour du nom d'un utilisateur
-PATCH http://localhost:9005/users/1/name
+PATCH http://localhost:8085/users/1/name
 Content-Type: application/json
 
 plpl
@@ -25,7 +25,7 @@ plpl
 ---
 
 ### Mise à jour du rôle d'un utilisateur
-PATCH http://localhost:9005/users/1/role
+PATCH http://localhost:8085/users/1/role
 Content-Type: application/json
 
 admin
@@ -33,11 +33,11 @@ admin
 ---
 
 ### Lecture d'un utilisateur par email
-GET http://localhost:9005/users?email=ff@example.com
+GET http://localhost:8085/users?email=ff@example.com
 
 ---
 
 ### Suppression d'un utilisateur par ID
-DELETE http://localhost:9005/users/3
+DELETE http://localhost:8085/users/3
 
 
