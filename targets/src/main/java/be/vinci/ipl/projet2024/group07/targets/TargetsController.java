@@ -1,6 +1,8 @@
 package be.vinci.ipl.projet2024.group07.targets;
 
 import be.vinci.ipl.projet2024.group07.targets.models.Target;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,8 +85,8 @@ public class TargetsController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @GetMapping("/targets/colocated") // vérifier avec le proxy
-  public Iterable<String> readColocated() {
+  @GetMapping("/targets/colocated")
+  public Iterable<Map<String, List<Target>>> readColocated() {
     return service.getIpColocated();
   }
 }
