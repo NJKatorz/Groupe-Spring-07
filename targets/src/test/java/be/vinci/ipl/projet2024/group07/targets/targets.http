@@ -1,12 +1,32 @@
 ### Read all
 GET http://localhost:8082/targets
 
-### Create one
+### Read all with all the filters
+GET http://localhost:8082/targets?minServers=1&maxServers=2
+
+### Read all with the min filter
+GET http://localhost:8082/targets?minServers=1
+
+### Read all with the max filter
+GET http://localhost:8082/targets?maxServers=2
+
+### Create one with every field needed
 POST http://localhost:8082/targets
 Content-Type: application/json
 
 {
   "companyName": "CyberCorp",
+  "domain": "cybercorp.com",
+  "location": "Paris, France",
+  "employees": 50,
+  "revenue": 1000000
+}
+
+### Create one with one of the fields missing (companyName)
+POST http://localhost:8082/targets
+Content-Type: application/json
+
+{
   "domain": "cybercorp.com",
   "location": "Paris, France",
   "employees": 50,
@@ -25,10 +45,25 @@ Content-Type: application/json
   "revenue": 1000000
 }
 
-### Read one
+### Create one that can be deleted
+POST http://localhost:8082/targets
+Content-Type: application/json
+
+{
+  "companyName": "ToDeleteCorp",
+  "domain": "todelet.com",
+  "location": "Paris, France",
+  "employees": 50,
+  "revenue": 1000000
+}
+
+### Read one target that exists
 GET http://localhost:8082/targets/1
 
-### Update one
+### Read one target that doens't exists
+GET http://localhost:8082/targets/1234
+
+### Update one with every field needed
 PUT http://localhost:8082/targets/1
 Content-Type: application/json
 
@@ -38,10 +73,36 @@ Content-Type: application/json
   "domain": "cybercorp.com",
   "location": "Bruxelles, Belgique",
   "employees": 50,
+  "servers": 100,
   "revenue": 1000000
 }
 
-### Création d'une attaque
+### Update one with one of the field missing (domain)
+PUT http://localhost:8082/targets/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "companyName": "CyberCorpV2",
+  "location": "Bruxelles, Belgique",
+  "employees": 50,
+  "revenue": 1000000
+}
+
+### Update one that doesn't exists
+PUT http://localhost:8082/targets/1234
+Content-Type: application/json
+
+{
+  "id": 1234,
+  "companyName": "CyberCorpV2",
+  "domain": "cybercorp.com",
+  "location": "Bruxelles, Belgique",
+  "employees": 50,
+  "revenue": 1000000
+}
+
+### Create one attack for the first target
 POST http://localhost:8084/attack
 Content-Type: application/json
 
@@ -49,7 +110,7 @@ Content-Type: application/json
   "targetId": 1
 }
 
-### Test création d'un serveur
+### Create one server for the first target
 POST http://localhost:8083/servers
 Content-Type: application/json
 
@@ -60,7 +121,7 @@ Content-Type: application/json
   "technology": "Apache"
 }
 
-### Test création d'un serveur
+### Create a second server for the first target (needed to test "colocated targets")
 POST http://localhost:8083/servers
 Content-Type: application/json
 
@@ -72,13 +133,22 @@ Content-Type: application/json
 }
 
 ### Delete one
-DELETE http://localhost:8082/targets/1
+DELETE http://localhost:8082/targets/3
 
-### Increase servers
+### Delete one that doesn't exists
+DELETE http://localhost:8082/targets/1234
+
+### Increase servers for the first target
 PATCH http://localhost:8082/targets/1/increase-servers
 
-### Decrease servers
+### Increase servers for a target that doesn't exist
+PATCH http://localhost:8082/targets/1234/increase-servers
+
+### Decrease servers for the first target
 PATCH http://localhost:8082/targets/1/decrease-servers
 
-### Get colocated targets
+### Decrease servers for a target that doesn't exist
+PATCH http://localhost:8082/targets/1234/decrease-servers
+
+### Get all colocated targets
 GET http://localhost:8082/targets/colocated
