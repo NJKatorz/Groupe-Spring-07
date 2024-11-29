@@ -55,6 +55,17 @@ Content-Type: application/json
 
 {
   "ipAddress": "192.168.1.10",
+  "targetId": 1,
+  "serverType": "web",
+  "technology": "Apache"
+}
+
+### Test création d'un serveur
+POST http://localhost:8083/servers
+Content-Type: application/json
+
+{
+  "ipAddress": "192.168.1.10",
   "targetId": 2,
   "serverType": "web",
   "technology": "Apache"
