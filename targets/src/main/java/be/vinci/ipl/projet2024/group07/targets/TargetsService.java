@@ -59,18 +59,18 @@ public class TargetsService {
     /**
      * Récupère toutes les cibles ou celles avec un nombre de serveurs spécifique.
      * @param minServers le nombre minimum de serveurs (optionnel).
-     * @param maxServers le nombre maximum de serveurs (optionnel).
+     * @param minRevenue le chiffre d'affaire minimum (optionnel).
      * @return une liste de cibles.
      */
-    public Iterable<Target> getAllTargets(Integer minServers, Integer maxServers) {
-        int min = 0;
-        int max = Integer.MAX_VALUE;
+    public Iterable<Target> getAllTargets(Integer minServers, Integer minRevenue) {
+        int minS = 0;
+        int minR = 0;
         if (minServers != null)
-            min = minServers;
-        if (maxServers != null)
-            max = maxServers;
+            minS = minServers;
+        if (minRevenue != null)
+            minR = minRevenue;
 
-        return targetsRepository.findAllByServersBetween(min, max);
+        return targetsRepository.findAllByServersAndRevenue(minS, minR);
     }
 
     /**
