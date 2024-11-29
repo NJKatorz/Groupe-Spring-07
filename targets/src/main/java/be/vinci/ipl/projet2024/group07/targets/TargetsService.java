@@ -64,7 +64,7 @@ public class TargetsService {
      */
     public Iterable<Target> getAllTargets(Integer minServers, Integer minRevenue) {
         int minS = 0;
-        int minR = Integer.MAX_VALUE;
+        int minR = 0;
         if (minServers != null)
             minS = minServers;
         if (minRevenue != null)
