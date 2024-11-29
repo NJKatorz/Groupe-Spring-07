@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-
 public class ServerController {
 
   private final ServerService serverService;
@@ -30,7 +29,7 @@ public class ServerController {
 
   @PostMapping("/servers")
   public ResponseEntity<Server> createOne(@RequestBody Server newServer) {
-    if (newServer.getIpAdress()==null || newServer.getServerType()==null || newServer.getTechnology()==null
+    if (newServer.getIpAddress()==null || newServer.getServerType()==null || newServer.getTechnology()==null
         || newServer.getTargetId() == 0) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -46,7 +45,7 @@ public class ServerController {
 
   @PutMapping("/servers/{serverId}")
   public ResponseEntity<Void> updateOne(@PathVariable int serverId, @RequestBody Server updatedServer) {
-    if (updatedServer.getIpAdress()==null || updatedServer.getServerType()==null || updatedServer.getTechnology()==null
+    if (updatedServer.getIpAddress()==null || updatedServer.getServerType()==null || updatedServer.getTechnology()==null
        || serverId != updatedServer.getId() ) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

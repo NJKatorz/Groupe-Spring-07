@@ -7,7 +7,9 @@ import be.vinci.ipl.projet2024.group07.attack.repositories.ExploitProxy;
 import be.vinci.ipl.projet2024.group07.attack.repositories.ServerProxy;
 import be.vinci.ipl.projet2024.group07.attack.repositories.TargetProxy;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AttackService {
 
   private final AttackRepository attackRepository;

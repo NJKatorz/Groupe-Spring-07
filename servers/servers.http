@@ -1,10 +1,36 @@
+### Creation de la cible
+POST http://localhost:8082/targets
+Content-Type: application/json
+
+{
+  "companyName": "CyberCorp",
+  "domain": "cybercorp.com",
+  "location": "Paris, France",
+  "employees": 50,
+  "revenue": 1000000
+}
+
+### Création d'une attaque
+POST http://localhost:8084/attack
+Content-Type: application/json
+
+{
+  "targetId": 1
+}
+
+
+### Récupération de toutes les attaques
+GET http://localhost:8084/attack
+
+
+
 ### Test création d'un serveur
 POST http://localhost:8083/servers
 Content-Type: application/json
 
 {
-  "ipAdress": "192.168.1.10",
-  "targetId": 54321,
+  "ipAddress": "192.168.1.10",
+  "targetId": 1,
   "serverType": "web",
   "technology": "Apache"
 }
@@ -18,8 +44,8 @@ Content-Type: application/json
 
 {
   "id": 2,
-  "ipAdress": "192.168.1.20",
-  "targetId": 54321,
+  "ipAddress": "192.168.1.20",
+  "targetId": 1,
   "serverType": "web",
   "technology": "Nginx",
   "validated": false
@@ -36,7 +62,7 @@ GET http://localhost:8083/servers/1
 PATCH http://localhost:8083/servers/2/validate
 
 ### Test récupération de serveurs associés à une cible
-GET http://localhost:8083/servers/target/54321
+GET http://localhost:8083/servers/target/1
 
 ### Test suppression de serveurs associés à une cible
 DELETE http://localhost:8083/servers/target/54321
