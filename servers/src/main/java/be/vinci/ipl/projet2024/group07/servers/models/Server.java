@@ -24,7 +24,7 @@ public class Server {
   @Column(nullable = false)
   private int id;
   @Column(nullable = false)
-  private String ipAdress;
+  private String ipAddress;
   @Column(nullable = false)
   private int targetId;
   @Column(nullable = false)
