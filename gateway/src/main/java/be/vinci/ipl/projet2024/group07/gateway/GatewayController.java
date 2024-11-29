@@ -602,4 +602,17 @@ public class GatewayController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
   }
+
+  // pour les tests d'autentification
+  @PostMapping("/users/admin")
+  public ResponseEntity<Void> createAdmin(@RequestBody UserWithCredentials userWithCredentials) {
+    try {
+      service.createAdmin(userWithCredentials);
+      return new ResponseEntity<>(HttpStatus.CREATED);
+    } catch (BadRequestException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user data");
+    } catch (ConflictException e) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
+    }
+  }
 }

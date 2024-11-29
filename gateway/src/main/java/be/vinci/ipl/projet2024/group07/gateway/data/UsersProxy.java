@@ -38,4 +38,8 @@ public interface UsersProxy {
 
   @GetMapping("/exploits/author/{authorId}")
   Iterable<Exploit> getExploitsByAuthor(@PathVariable int authorId);
+
+  // pour les tests d'autentification
+  @PostMapping("/users/admin")
+  User createAdmin(@RequestBody UserWithCredentials credentials);
 }

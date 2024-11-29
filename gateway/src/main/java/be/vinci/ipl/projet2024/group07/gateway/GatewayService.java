@@ -111,6 +111,22 @@ public class GatewayService {
     }
   }
 
+  // pour les tests d'autentification
+  public void createAdmin(UserWithCredentials userWithCredentials)
+      throws BadRequestException, ConflictException {
+    try {
+      usersProxy.createAdmin(userWithCredentials);
+    } catch (FeignException e) {
+      if (e.status() == 400) {
+        throw new BadRequestException();
+      } else if (e.status() == 409) {
+        throw new ConflictException();
+      } else {
+        throw e;
+      }
+    }
+  }
+
   public User readOneUserById(int userId) throws NotFoundException {
     try {
       return usersProxy.readOneByUserId(userId);

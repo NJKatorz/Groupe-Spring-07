@@ -72,4 +72,16 @@ public class UsersController {
     boolean deleted = service.deleteOne(id);
     if (!deleted) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
   }
+
+  // pour les tests d'autentification
+  @PostMapping("/admin")
+  public ResponseEntity<User> createAdmin(@RequestBody UnsafeCredentials user) {
+    if (user.invalid()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Données manquantes");
+    if (user.isPasswordTooShort()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Mot de passe trop court");
+
+    User createdUser = service.createAdmin(user);
+
+    return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+
+  }
 }

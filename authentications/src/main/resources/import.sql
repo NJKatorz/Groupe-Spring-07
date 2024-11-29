@@ -1,1 +1,1 @@
-INSERT INTO credentials(email, password) VALUES ('admin@gmail.com', 'admin123');
+-- INSERT INTO credentials(email, password) VALUES ('admin@gmail.com', 'admin123');
