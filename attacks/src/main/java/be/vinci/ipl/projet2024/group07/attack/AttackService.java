@@ -33,11 +33,11 @@ public class AttackService {
     return attackRepository.findById(id).orElse(null);
   }
 
-  public void createOne (Attack attack){
+  public Attack createOne (Attack attack){
     if(targetProxy.readOne(attack.getTargetId())==null)
       throw new IllegalArgumentException("Les données de l'attaque sont manquantes ou incorrectes");
     attack.setStatus(Status.PLANIFIEE);
-    attackRepository.save(attack);
+    return attackRepository.save(attack);
   }
 
 
