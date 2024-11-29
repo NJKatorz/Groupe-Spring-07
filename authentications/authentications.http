@@ -1,4 +1,4 @@
-###
+### Création d'un utilisateur
 POST http://localhost:8086/auth/register
 Content-Type: application/json
 
@@ -7,7 +7,7 @@ Content-Type: application/json
   "password": "password123"
 }
 
-###
+### Connexion et renvoi d'un token JWT
 POST http://localhost:8086/auth/login
 Content-Type: application/json
 
@@ -16,14 +16,14 @@ Content-Type: application/json
   "password": "password123"
 }
 
-###
+### Vérification du token
 POST http://localhost:8086/auth/verify-token
 Content-Type: text/plain
 
 eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoMCIsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSJ9.KT7Z7aaHIB8kiy56A1JuYYV7mhnJxU6omsF1CtD_22WrWA0d_9R2o29sR2hz-z2GJzys1EIeoZCza3nhqHKDzQ
 
 
-###
+### Changement de mot de passe
 PATCH http://localhost:8086/auth/change-password
 Content-Type: application/json
 
@@ -33,7 +33,7 @@ Content-Type: application/json
   "newPassword": "password1234"
 }
 
-###
+### Suppression d'un utilisateur
 DELETE http://localhost:8086/auth/delete
 Content-Type: text/plain
 

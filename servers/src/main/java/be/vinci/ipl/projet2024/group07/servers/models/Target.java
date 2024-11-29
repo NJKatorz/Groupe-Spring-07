@@ -13,24 +13,15 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
-@Entity(name = "servers")
-public class Server {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(nullable = false)
+public class Target {
   private int id;
-  @Column(nullable = false)
-  private String ipAddress;
-  @Column(nullable = false)
-  private int targetId;
-  @Column(nullable = false)
-  private String serverType;
-  @Column(nullable = false)
-  private String technology;
-  @Column(nullable = false)
-  private boolean validated;
+  private String companyName;
+  private String domain;
+  private String location;
+  private int employees;
+  private int servers;
+  private int revenue;
 }

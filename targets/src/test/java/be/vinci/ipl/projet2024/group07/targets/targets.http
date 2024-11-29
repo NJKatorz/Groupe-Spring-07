@@ -1,0 +1,42 @@
+### Read all
+GET http://localhost:8082/targets
+
+### Create one
+POST http://localhost:8082/targets
+Content-Type: application/json
+
+{
+  "companyName": "CyberCorp",
+  "domain": "cybercorp.com",
+  "location": "Paris, France",
+  "employees": 50,
+  "revenue": 1000000
+}
+
+### Read one
+GET http://localhost:8082/targets/1
+
+### Update one
+PUT http://localhost:8082/targets/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "companyName": "CyberCorpV2",
+  "domain": "cybercorp.com",
+  "location": "Bruxelles, Belgique",
+  "employees": 50,
+  "revenue": 1000000
+}
+
+### Delete one
+DELETE http://localhost:8082/targets/1
+
+### Increase servers
+PATCH http://localhost:8082/targets/1/increase-servers
+
+### Decrease servers
+PATCH http://localhost:8082/targets/1/decrease-servers
+
+### Get colocated targets
+GET http://localhost:8082/targets/colocated

@@ -11,7 +11,8 @@ import lombok.*;
 @Entity(name = "users")
 public class User {
 
-  @Id @Column
+  @Id
+  @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
@@ -22,5 +23,9 @@ public class User {
   private String email;
 
   @Column(nullable = false)
+  private String password;
+
+  @Column(nullable = false)
   private String role;
+
 }
