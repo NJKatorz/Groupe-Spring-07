@@ -30,10 +30,10 @@ public class AttackControler {
   }
 
   @PostMapping("/attack")
-  public ResponseEntity<String> createOne(@RequestBody Attack attack){
+  public ResponseEntity<Attack> createOne(@RequestBody Attack attack){
     try{
-      attackService.createOne(attack);
-      return ResponseEntity.status(HttpStatus.CREATED).body("L'attaque a été créée");
+      Attack newAttack = attackService.createOne(attack);
+      return new ResponseEntity<>(newAttack, HttpStatus.CREATED);
     }
     catch (Exception e){
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
