@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 
 @Repository
 @FeignClient(name = "targets")
@@ -18,9 +17,11 @@ public interface TargetProxy {
 
 
   @PatchMapping("/targets/{targetId}/increase-servers")
-  void increaseServers(@PathVariable int targetId);
+  @Transactional
+  void increaseServers(@PathVariable int targetId);//erreur avec Patch mais pas Put
 
 
   @PatchMapping("/targets/{targetId}/decrease-servers")
-  void decreaseServers(@PathVariable int targetId);
+  @Transactional
+  void decreaseServers(@PathVariable int targetId);//erreur avec Patch mais pas Put
 }

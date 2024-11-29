@@ -33,4 +33,11 @@ public class Target {
   private int servers;
   @Column(nullable = false)
   private int revenue;
+
+  public boolean invalid() {
+    return companyName == null || companyName.isBlank() ||
+        domain == null || domain.isBlank() ||
+        location == null || location.isBlank() ||
+        employees <= 0 || servers < 0 || revenue <= 0;
+  }
 }
