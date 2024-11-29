@@ -3,16 +3,35 @@ POST http://localhost:8085/users
 Content-Type: application/json
 
 {
-  "name": "vggj",
-  "email": "hvvj@example.com",
+  "name": "john",
+  "email": "johndoe@example.com",
   "password": "securepasswordtest"
+}
+
+### Création d'un utilisateur avec une donnée manquante
+POST http://localhost:8085/users
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "johndoe@example.com",
+  "password": "securepasswordtest"
+}
+
+### Création d'un utilisateur avec un mot de passe trop court
+POST http://localhost:8085/users
+Content-Type: application/json
+
+{
+  "name": "john",
+  "email": "johndoe@example.com",
+  "password": "short"
 }
 
 
 ### Lecture d'un utilisateur par ID
 GET http://localhost:8085/users/1
 
----
 
 ### Mise à jour du nom d'un utilisateur
 PATCH http://localhost:8085/users/1/name
@@ -20,8 +39,16 @@ Content-Type: application/json
 
 plpl
 
+### Mise à jour du nom d'un utilisateur avec un ID inconnu
+PATCH http://localhost:8085/users/999/name
+Content-Type: application/json
 
----
+plpl
+
+### Mise à jour du nom d'un utilisateur avec donnée manquante
+PATCH http://localhost:8085/users/1/name
+Content-Type: text/plain
+
 
 ### Mise à jour du rôle d'un utilisateur
 PATCH http://localhost:8085/users/1/role
@@ -29,14 +56,14 @@ Content-Type: application/json
 
 admin
 
----
 
 ### Lecture d'un utilisateur par email
 GET http://localhost:8085/users?email=ff@example.com
 
----
+
 
 ### Suppression d'un utilisateur par ID
 DELETE http://localhost:8085/users/1
 
-
+### Suppression d'un utilisateur par ID inconnu
+DELETE http://localhost:8085/users/999

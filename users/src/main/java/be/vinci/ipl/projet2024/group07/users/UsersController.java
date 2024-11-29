@@ -21,7 +21,8 @@ public class UsersController {
 
   @PostMapping
   public ResponseEntity<User> createOne(@RequestBody UnsafeCredentials user) {
-    if (user.invalid()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    if (user.invalid()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Données manquantes");
+    if (user.isPasswordTooShort()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Mot de passe trop court");
 
     User createdUser = service.createOne(user);
 
@@ -32,6 +33,7 @@ public class UsersController {
   @PatchMapping("/{userId}/name")
   public ResponseEntity<Void> updateUserName(@PathVariable Integer userId, @RequestBody String newName) {
     boolean updated = service.updateUserName(userId, newName);
+    if (newName ==null || newName.isBlank() || newName.isEmpty() || newName.equals("")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Donnée manquante");
     if (!updated) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé");
     }
@@ -40,7 +42,6 @@ public class UsersController {
 
   @PatchMapping("/{userId}/role")
   public ResponseEntity<Void> updateUserRole(@PathVariable Integer userId, @RequestBody String newRole) {
-
     boolean updated = service.updateUserRole(userId, newRole);
     if (!updated) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé");
