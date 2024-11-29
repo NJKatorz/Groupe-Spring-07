@@ -72,7 +72,7 @@ public class UsersService {
 
     User findUser = repository.findById(id).orElse(null);
     if (findUser==null) return false;
-    //exploitProxy.delete(id);
+    exploitProxy.delete(id);
     authenticationProxy.delete(findUser.getEmail());
     return true;
   }
