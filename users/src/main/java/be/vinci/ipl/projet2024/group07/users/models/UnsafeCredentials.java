@@ -15,16 +15,23 @@ public class UnsafeCredentials {
   private String email;
   private String password;
 
+  private static final int MIN_PASSWORD_LENGTH = 8;
+
   public SafeCredentials makeSafe(String hashedPassword) {
     return new SafeCredentials(email, hashedPassword);
   }
 
   public User toUser() {
-    return new User(0, name,email, password, "user");
+    return new User(0, name,email,"user");
   }
 
   public boolean invalid() {
     return email == null || email.isBlank() ||
-        password == null || password.isBlank();
+        password == null || password.isBlank() ||
+        name ==null || name.isBlank();
+  }
+
+  public boolean isPasswordTooShort() {
+    return password != null && password.length() < MIN_PASSWORD_LENGTH;
   }
 }
