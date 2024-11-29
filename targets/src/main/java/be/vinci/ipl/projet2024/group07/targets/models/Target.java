@@ -34,6 +34,10 @@ public class Target {
   @Column(nullable = false)
   private int revenue;
 
+  /**
+   * Vérifie si la cible contient toutes les informations nécéssaires.
+   * @return true si la cible est valide, false dans le cas contraire.
+   */
   public boolean invalid() {
     return companyName == null || companyName.isBlank() ||
         domain == null || domain.isBlank() ||

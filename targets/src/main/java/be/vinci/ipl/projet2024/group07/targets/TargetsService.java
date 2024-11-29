@@ -13,18 +13,33 @@ import java.util.Map;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service pour les cibles.
+ * Fournit des méthodes pour gérer les cibles.
+ */
 @Service
 public class TargetsService {
     private final TargetsRepository targetsRepository;
     private final ServersProxy serversProxy;
     private final AttacksProxy attacksProxy;
 
+    /**
+     * Constructeur pour initialiser les dépendances.
+     * @param targetsRepository le répertoire des cibles.
+     * @param serversProxy le proxy pour les serveurs.
+     * @param attacksProxy le proxy pour les attaques.
+     */
     public TargetsService(TargetsRepository targetsRepository, ServersProxy serversProxy, AttacksProxy attacksProxy) {
         this.targetsRepository = targetsRepository;
         this.serversProxy = serversProxy;
         this.attacksProxy = attacksProxy;
     }
 
+    /**
+     * Crée une nouvelle cible.
+     * @param target la cible à créer.
+     * @return la cible créée, ou null si les données de la cible sont incorrectes.
+     */
     public Target createTarget(Target target) {
         if (target.getRevenue() <= 0) return null;
         if (target.getEmployees() <= 0) return null;
@@ -32,10 +47,21 @@ public class TargetsService {
         return targetsRepository.save(target);
     }
 
+    /**
+     * Récupère une cible par son identifiant.
+     * @param id l'identifiant de la cible.
+     * @return la cible correspondant à l'identifiant, ou null si elle n'existe pas.
+     */
     public Target getTargetById(int id) {
         return targetsRepository.findById(id).orElse(null);
     }
 
+    /**
+     * Récupère toutes les cibles ou celles avec un nombre de serveurs spécifique.
+     * @param minServers le nombre minimum de serveurs (optionnel).
+     * @param maxServers le nombre maximum de serveurs (optionnel).
+     * @return une liste de cibles.
+     */
     public Iterable<Target> getAllTargets(Integer minServers, Integer maxServers) {
         int min = 0;
         int max = Integer.MAX_VALUE;
@@ -47,20 +73,36 @@ public class TargetsService {
         return targetsRepository.findAllByServersBetween(min, max);
     }
 
+    /**
+     * Supprime une cible par son identifiant.
+     * @param id l'identifiant de la cible.
+     * @return true si la cible a été supprimée, false sinon.
+     */
     public boolean deleteTarget(int id) {
         if (!targetsRepository.existsById(id)) return false;
-        serversProxy.deleteByTarget(id);
         attacksProxy.deleteTargets(id);
+        serversProxy.deleteByTarget(id);
         targetsRepository.deleteById(id);
         return true;
     }
 
+    /**
+     * Met à jour une cible.
+     * @param target la cible à mettre à jour.
+     * @return true si la cible a été mise à jour, false si elle n'existe pas.
+     */
     public boolean updateOne(Target target){
         if (!targetsRepository.existsById(target.getId())) return false;
+        Target old = targetsRepository.findById(target.getId()).get();
+        target.setServers(old.getServers());
         targetsRepository.save(target);
         return true;
     }
 
+    /**
+     * Recherche les cibles qui sont hébergées sur des serveurs mutualisés.
+     * @return une liste de dictionnaires contenant les adresses IP des serveurs mutualisés et les cibles qui y sont hébergées.
+     */
     public Iterable<Map<String, List<Target>>> getIpColocated() {
         Map<String, Set<Target>> dicoIp = new HashMap<>();
         for (Target target : targetsRepository.findAll()) {
