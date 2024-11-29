@@ -8,6 +8,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "targets")
 public interface TargetProxy {
 
+
+  /**
+   * Récupère une cible en fonction de son ID.
+   * @param targetId l'ID de la cible à récupérer.
+   * @return la cible correspondante.
+   */
   @GetMapping("/targets/{targetId}")
   Target readOne(@PathVariable int targetId);
 }

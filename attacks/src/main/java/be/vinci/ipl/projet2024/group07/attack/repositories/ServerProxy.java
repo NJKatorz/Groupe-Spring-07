@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "servers")
 public interface ServerProxy {
 
+  /**
+   * Récupère un serveur en fonction de son ID.
+   * @param serverId l'ID du serveur à récupérer.
+   * @return le serveur correspondant.
+   */
   @GetMapping("/servers/{serverId}")
   Server readOne(@PathVariable int serverId);
 

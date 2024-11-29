@@ -27,10 +27,20 @@ public class ServerService {
   }
 
 
+  /**
+   * Récupère un serveur en fonction de son ID.
+   * @param serverId l'ID du serveur à récupérer.
+   * @return le serveur correspondant.
+   */
   public Server getOne(int serverId) {return repository.findById(serverId).orElse(null);}
 
 
-
+  /**
+   * Crée un nouveau serveur.
+   *
+   * @param newServer le nouveau serveur à créer.
+   * @return le serveur créé, ou null si la cible associée n'existe pas.
+   */
   public Server createOne(Server newServer) {
     if (targetProxy.readOne(newServer.getTargetId()) == null) {
       return null;
@@ -39,10 +49,20 @@ public class ServerService {
     return repository.save(newServer);
   }
 
+  /**
+   * Met à jour un serveur existant.
+   *
+   * @param updatedServer le serveur mis à jour.
+   */
   public void updateOne(Server updatedServer) {
     repository.save(updatedServer);
   }
 
+  /**
+   * Supprime un serveur en fonction de son ID.
+   * @param serverId l'ID du serveur à supprimer.
+   * @return le serveur supprimé, ou null si aucun serveur n'est trouvé pour cet ID.
+   */
   public Server deleteOne(int serverId) {
     Server server = repository.findById(serverId).orElse(null);
     if (server == null) {
@@ -53,16 +73,34 @@ public class ServerService {
     return server;
   }
 
+
+  /**
+   * Valide un serveur existant.
+   *
+   * @param server le serveur à valider.
+   */
   public void validateServer(Server server) {
     server.setValidated(true);
     repository.save(server);
 
   }
 
+  /**
+   * Récupère tous les serveurs associés à une cible.
+   *
+   * @param targetId l'ID de la cible.
+   * @return les serveurs associés à la cible.
+   */
   public Iterable<Server> getByTarget(int targetId) {
     return repository.findByTargetId(targetId);
   }
 
+
+  /**
+   * Supprime tous les serveurs associés à une cible.
+   *
+   * @param targetId l'ID de la cible.
+   */
   public void deleteByTarget(int targetId) {
     repository.findByTargetId(targetId).forEach(server -> attackProxy.deleteByServer(server.getId()));
     repository.deleteByTargetId(targetId);
