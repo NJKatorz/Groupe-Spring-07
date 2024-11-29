@@ -22,13 +22,17 @@ public class UnsafeCredentials {
   }
 
   public User toUser() {
-    return new User(0, name,email,"user");
+    return new User(0, name,email, "user");
+  }
+
+  // pour les tests d'autentification
+  public User toAdmin() {
+    return new User(0, name,email, "admin");
   }
 
   public boolean invalid() {
     return email == null || email.isBlank() ||
-        password == null || password.isBlank() ||
-        name ==null || name.isBlank();
+        password == null || password.isBlank();
   }
 
   public boolean isPasswordTooShort() {

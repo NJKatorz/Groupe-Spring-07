@@ -1,0 +1,1375 @@
+openapi: 3.0.0
+info:
+  title: Service gateway
+  description: Point d'entrée unique pour l'application Vinci Cyber Intelligence.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Serveur local
+
+paths:
+
+  /users:
+    get:
+      summary: Trouve un utilisateur sur base de son email
+      description: 
+        Récupère les détails d'un utilisateur spécifique en utilisant son email.
+        N'importe quel utilisater identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      parameters:
+        - name: email
+          in: query
+          required: true
+          description: Email de l'utilisateur
+          schema:
+            type: string
+            example: "john.doe@example.com"
+      responses:
+        '200':
+          description: Renvoie les données de l'utilisateur correspondant à cet email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Le paramètre email est manquant
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucun utilisateur trouvé pour cet email
+    post:
+      summary: Crée un nouvel utilisateur
+      description: 
+        Permet de créer un nouvel utilisateur.
+        Crée également les credentials de l'utilisateur.
+        L'ID de l'utilisateur sera autogénéré. Son rôle sera "user". 
+        Il n'est pas nécessaire d'être identifié pour créer un nouvel utilisateur.
+      requestBody:
+        required: true
+        description: 
+          Données de l'utilisateur à enregistrer. 
+          Doit inclure un nom, un email, et un mot de passe.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nom de l'utilisateur
+                email:
+                  type: string
+                  description: Email de l'utilisateur
+                password:
+                  type: string
+                  description: Mot de passe de l'utilisateur
+              example:
+                name: "John Doe"
+                email: "john.doe@example.com"
+                password: "password123"
+      responses:
+        '201':
+          description: L'utilisateur a été créé, renvoie ses données y compris son ID autogénéré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Les données de l'utilisateur sont manquantes ou incorrectes
+        '409':
+          description: Un utilisateur existe déjà avec cet email
+
+  /login:
+    post:
+      summary: Authentifie un utilisateur
+      description: 
+        Permet d'authentifier un utilisateur. 
+        Retourne un token JWT si l'authentification est réussie.
+        Il n'est pas nécessaire d'être identifié pour s'authentifier.
+      requestBody:
+        required: true
+        description: Credentials de l'utilisateur, doit inclure un email et un password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+      responses:
+        '200':
+          description: Authentification réussie, renvoie un token de connexion JWT
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIzNDU2Nzg5LCJuYW1lIjoiSm9zZXBoIn0.OpOSSw7e485LOP5PrzScxHb7SR6sAOMRckfFwi4rp7o
+        '400':
+          description: Les données des credentials sont manquantes ou incorrectes
+        '401':
+          description: Authentification échouée, email ou mot de passe incorrect
+
+  /users/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        description: ID de l'utilisateur
+        schema:
+          type: string
+          example: 1
+    get:
+      summary: Consulte les détails d'un utilisateur
+      description: 
+        Récupère les détails d'un utilisateur spécifique en utilisant son ID.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '200':
+          description: Renvoie les détails de l'utilisateur correspondant à cet ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucun utilisateur trouvé pour cet ID
+    delete:
+      summary: Supprime un utilisateur
+      description: 
+        Supprime un utilisateur spécifique en utilisant son ID. 
+        Cette opération supprime également ses credentials et tous les exploits qu'il a créé.
+        Seul l'utilisateur lui-même ou un administrateur peut supprimer un utilisateur.
+      security:
+        - BearerAuth:
+          - Utilisateur à supprimer
+          - Administrateur
+      responses:
+        '204':
+          description: L'utilisateur et les credentials et exploits associés ont été supprimés
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+        '404':
+          description: Aucun utilisateur trouvé pour cet ID
+
+  /users/{userId}/name:
+    patch:
+      summary: Modifie le nom d'un utilisateur
+      description: 
+        Permet de modifier le nom d'un utilisateur existant.
+        Seul l'utilisateur lui-même ou un administrateur peut modifier le nom d'un utilisateur.
+      security:
+        - BearerAuth:
+          - Utilisateur à modifier
+          - Administrateur
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID de l'utilisateur
+          schema:
+            type: string
+            example: 1
+      requestBody:
+        required: true
+        description: Nouveau nom de l'utilisateur
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: "Jane Doe"
+      responses:
+        '204':
+          description: Le nom de l'utilisateur a été modifié
+        '400':
+          description: Le nom de l'utilisateur est manquant ou incorrect
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+        '404':
+          description: Aucun utilisateur trouvé pour cet ID
+
+  /users/{userId}/role:
+    patch:
+      summary: Modifie le rôle d'un utilisateur
+      description: 
+        Permet de modifier le rôle d'un utilisateur existant.
+        Seul un administrateur peut modifier le rôle d'un utilisateur.
+      security:
+        - BearerAuth:
+          - Administrateur
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID de l'utilisateur
+          schema:
+            type: string
+            example: 1
+      requestBody:
+        required: true
+        description: Nouveau rôle de l'utilisateur
+        content:
+          text/plain:
+            schema:
+              type: string
+              enum:
+                - admin
+                - user
+              example: "admin"
+      responses:
+        '204':
+          description: Le rôle de l'utilisateur a été modifié
+        '400':
+          description: Le rôle de l'utilisateur est manquant ou incorrect
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+        '404':
+          description: Aucun utilisateur trouvé pour cet ID
+
+  /users/{userId}/password:
+    patch:
+      summary: Change le mot de passe de l'utilisateur
+      description: 
+        Permet à un utilisateur de changer son mot de passe.
+        Seul l'utilisateur lui-même ou un administrateur peut changer le mot de passe d'un utilisateur.
+      security:
+        - BearerAuth:
+          - Utilisateur à modifier
+          - Administrateur
+      requestBody:
+        required: true
+        description: Credentials actuels et nouveau mot de passe
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Email de l'utilisateur
+                oldPassword:
+                  type: string
+                  description: Ancien mot de passe
+                newPassword:
+                  type: string
+                  description: Nouveau mot de passe
+              required:
+                - email
+                - oldPassword
+                - newPassword
+              example:
+                email: "john.doe@example.com"
+                oldPassword: "password123"
+                newPassword: "newpassword123"
+      responses:
+        '204':
+          description: Le mot de passe de l'utilisateur a été changé
+        '400':
+          description: Les données de la requête sont manquantes
+        '401':
+          description: Authentification échouée, email ou ancien mot de passe incorrect
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+
+  /users/{userId}/exploits:
+    get:
+      summary: Liste les exploits créés par un utilisateur
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          description: Identifiant de l'auteur
+          schema:
+            type: integer
+            example: 1
+      description: 
+        Récupère une liste de tous les exploits créés par un utilisateur spécifique.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '200':
+          description: Renvoie la liste des exploits créés par l'auteur
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exploit'
+        '401':
+          description: L'utilisateur n'est pas identifié
+
+  /targets:
+    get:
+      summary: Liste toutes les cibles
+      description: 
+        Récupère une liste de toutes les cibles enregistrées dans la plateforme.
+        L'utilisateur peut filtrer les cibles par nombre de serveurs ou chiffres d'affaires minimum en ajoutant des paramètres de requête optionnels.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      parameters:
+        - name: minServers
+          in: query
+          required: false
+          description: Nombre minimum de serveur de la cible
+          schema:
+            type: integer
+            example: 20
+        - name: minRevenue
+          in: query
+          required: false
+          description: Chiffre d'affaire minimum de la cible
+          schema:
+            type: number
+            example: 10000000
+      responses:
+        '200':
+          description: Renvoie la liste des cibles correspondant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Target'
+        '401':
+          description: L'utilisateur n'est pas identifié
+    post:
+      summary: Crée une nouvelle cible
+      description: 
+        Permet de créer une nouvelle cible. 
+        L'ID de la cible sera autogénéré.
+        Le nombre de serveurs sera initialisé à zéro.
+        Le nombre d'employé et le chiffre d'affaire doivent être supérieurs à zéro.
+        Seul un administrateur peut créer une nouvelle cible.
+      security:
+        - BearerAuth:
+          - Administrateur
+      requestBody:
+        required: true
+        description: 
+          Données de la cible à créer.
+          Doit inclure le nom de l'entreprise, le domaine, la localisation, le nombre d'employés, et le chiffre d'affaires.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                companyName:
+                  type: string
+                  description: Nom de l'entreprise
+                domain:
+                  type: string
+                  description: Nom de domaine de l'entreprise
+                location:
+                  type: string
+                  description: Localisation de l'entreprise
+                employees:
+                  type: integer
+                  description: Nombre d'employés de l'entreprise
+                revenue:
+                  type: number
+                  description: Chiffre d'affaires de l'entreprise
+              example:
+                companyName: "CyberCorp"
+                domain: "cybercorp.com"
+                location: "Paris, France"
+                employees: 500
+                revenue: 1000000
+      responses:
+        '201':
+          description: Cible créée, renvoie ses données y compris son ID autogénéré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Target'
+        '400':
+          description: Les données de la cible sont manquantes ou incorrectes
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+
+  /targets/{targetId}:
+    parameters:
+      - name: targetId
+        in: path
+        required: true
+        description: ID de la cible
+        schema:
+          type: string
+          example: 54321
+    get:
+      summary: Consulte les détails d'une cible
+      description: 
+        Récupère les détails d'une cible spécifique en utilisant son ID.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '200':
+          description: Renvoie les détails de la cible correspond à cet ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Target'
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucune cible trouvée pour cet ID
+    put:
+      summary: Modifie une cible
+      description: 
+        Permet de modifier les détails d'une cible existante en utilisant son ID. 
+        Il n'est pas possible de modifier l'ID de la cible.
+        Le nombre de serveurs ne peut être modifié de cette manière.
+        Seul un administrateur peut modifier une cible.
+      security:
+        - BearerAuth:
+          - Administrateur
+      requestBody:
+        required: true
+        description: 
+          Nouvelles données de la cible.
+          L'ID de la cible et le nombre de serveurs doivent la même valeur que la donnée actuelle.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Target'
+      responses:
+        '204':
+          description: La cible a été modifiée
+        '400':
+          description: Les nouvelles données de la cible sont manquantes ou incorrectes
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+        '404':
+          description: Aucune cible trouvée pour cet ID
+    delete:
+      summary: Supprime une cible
+      description: 
+        Supprime une cible spécifique en utilisant son ID. 
+        Supprime également les serveurs et les attaques associées à cette cible.
+        Seul un administrateur peut supprimer une cible.
+      security:
+        - BearerAuth:
+          - Administrateur
+      responses:
+        '204':
+          description: La cible, les serveurs et les attaques correspondant ont été supprimée
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+        '404':
+          description: Aucune cible trouvée pour cet ID
+
+  /targets/{targetId}/servers:
+    get:
+      summary: Liste les serveurs d'une cible
+      parameters:
+      - name: targetId
+        in: path
+        required: true
+        description: ID de la cible
+        schema:
+          type: integer
+          example: 54321
+      description: 
+        Récupère une liste de tous les serveurs associés à une cible spécifique en utilisant son ID.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      
+      responses:
+        '200':
+          description: Renvoie la liste des serveurs de la cible
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Server'
+        '401':
+          description: L'utilisateur n'est pas identifié
+
+  /targets/colocated:
+    get:
+      summary: Recherche des cibles co-localisées
+      description: 
+        Permet de rechercher des cibles qui sont hébergées sur des serveurs mutualisés.
+        Les recherches se font via le service des serveurs et seules les cibles hébergées sur des serveurs avec au moins deux cibles sont renvoyées. 
+        Les résultats incluent l'adresse IP du serveur mutualisé.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security: 
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '200':
+          description: Renvoie les résultats de la recherche
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    serverIp:
+                      type: string
+                      description: Adresse IP du serveur mutualisé
+                    targets:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Target'
+                  example:
+                    serverIp: "192.168.1.1"
+                    targets:
+                      - id: 54321
+                        companyName: "CyberCorp"
+                        domain: "cybercorp.com"
+                        location: "Paris, France"
+                        employees: 500
+                        servers: 10
+                        revenue: 1000000
+                      - id: 98765
+                        companyName: "OtherCorp"
+                        domain: "othercorp.com"
+                        location: "Paris, France"
+                        employees: 20
+                        servers: 2
+                        revenue: 100000
+        '401':
+          description: L'utilisateur n'est pas identifié
+
+  /servers:
+    post:
+      summary: Crée un nouveau serveur
+      description: 
+        Permet de créer un nouveau serveur. 
+        L'ID du serveur sera autogénérée.
+        À sa création, le serveur ne sera pas encore validée.
+        Vérifie que l'ID de la cible à qui il appartient correspond bien à une cible existant.
+        Cette opération augmente également le nombre de serveurs de la cible associée.
+        N'importe quel utilisateur identifié peut créer un nouveau serveur.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      requestBody:
+        required: true
+        description: 
+          Données du serveur à créer.
+          Doit inclure une adresse IP, l'ID de la cible à qui il appartient, le type de serveur et la technologie utilisée. 
+          L'ID de la cible doit correspondre à une cible existante.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ipAddress:
+                  type: string
+                  description: Adresse IP du serveur
+                targetId:
+                  type: integer
+                  description: Identifiant de la cible à qui appartient le serveur
+                serverType:
+                  type: string
+                  description: Type de serveur
+                  enum:
+                    - web
+                    - database
+                    - backup
+                    - mail
+                    - workstation
+                    - ...
+                technology:
+                  type: string
+                  description: Technologie utilisée par le serveur
+              example:
+                ipAddress: "192.168.1.1"
+                targetId: 54321
+                serverType: "web"
+                technology: "Apache"
+      responses:
+        '201':
+          description: Serveur créé, renvoie ses données y compris son ID autogénéré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Server'
+        '400':
+          description: Les données du serveur sont manquantes ou incorrectes
+        '401':
+          description: L'utilisateur n'est pas identifié
+
+  /servers/{serverId}:
+    parameters:
+      - name: serverId
+        in: path
+        required: true
+        description: ID du serveur
+        schema:
+          type: integer
+          example: 67890
+    get:
+      summary: Consulte les détails d'un serveur
+      description: 
+        Récupère les détails d'un serveur spécifique en utilisant son ID. 
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '200':
+          description: Renvoie les détails du serveur correspondant à cet ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Server'
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucun serveur trouvé pour cet ID
+    put:
+      summary: Modifie un serveur
+      description: 
+        Permet de modifier les détails d'un serveur existant en utilisant son ID. 
+        Il n'est pas possible de modifier l'ID du serveur ou l'ID de la cible à qui le serveur appartient.
+        Le serveur ne peut pas être validé de cette manière.
+        N'importe quel utilisateur identifié peut modifier un serveur.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      requestBody:
+        required: true
+        description: 
+          Nouvelles données du serveur à modifier.
+          L'ID du serveur, l'ID de la cible associée et le statut de validation doivent avoir la même valeur que la donnée actuelle.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Server'
+      responses:
+        '204':
+          description: Le serveur a été modifié
+        '400':
+          description: Les nouvelles données du serveur sont manquantes ou incorrectes
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucun serveur trouvé pour cet ID
+    delete:
+      summary: Supprime un serveur
+      description: 
+        Supprime un serveur spécifique en utilisant son ID. 
+        Supprime également les attaques associées à ce serveur.
+        Cette opération diminue également le nombre de serveurs de la cible associée.
+        N'importe quel utilisateur identifié peut supprimer un serveur.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '204':
+          description: Le serveur et les attaques assocées ont été supprimés
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucun serveur trouvé pour cet ID
+
+  /servers/{serverId}/validate:
+    patch:
+      summary: Valide un serveur
+      description: 
+        Valide un serveur spécifique en utilisant son ID.
+        Le serveur ne peut pas déjà avoir été validée".
+        Seul un administrateur peut valider un serveur.
+      security:
+        - BearerAuth:
+          - Administrateur
+      parameters:
+        - name: serverId
+          in: path
+          required: true
+          description: ID du serveur à valider
+          schema:
+            type: integer
+            example: 67890
+      responses:
+        '204':
+          description: Le serveur a bien été validé
+        '400':
+          description: Le serveur était déjà validé
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+        '404':
+          description: Aucun serveur trouvé pour cet ID
+
+  /exploits:
+    get:
+      summary: Liste tous les exploits
+      description: 
+        Récupère une liste de tous les exploits existants. 
+        L'utilisateur peut filtrer les exploits par type de serveur en ajoutant un paramètre de requête optionnel.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      parameters:
+        - name: serverType
+          in: query
+          description: Type de serveur
+          required: false
+          schema:
+            type: string
+            example: "database"
+      responses:
+        '200':
+          description: Renvoie la liste des exploits correspondant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exploit'
+        '401':
+          description: L'utilisateur n'est pas identifié
+    post:
+      summary: Crée un nouvel exploit
+      description: 
+        Permet de créer un nouvel exploit. 
+        L'ID de l'exploit sera autogénéré.
+        À sa création, l'exploit ne sera pas encore validé.
+        Vérifie que l'ID de l'auteur correspond bien à un utilisateur existant.
+        N'importe quel utilisateur identifié peut créer un nouvel exploit.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      requestBody:
+        required: true
+        description: 
+          Données de l'exploit à enregistrer.
+          Doit inclure un nom, une description, l'identifiant de l'auteur, le type de serveur vulnérable, et un guide pas à pas. 
+          L'ID de l'utilisateur doit correspondre à un utilisateur existant.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nom de l'exploit
+                description:
+                  type: string
+                  description: Description détaillée de l'exploit
+                authorId:
+                  type: integer
+                  description: Identifiant de l'utilisateur auteur de l'exploit
+                serverType:
+                  type: string
+                  description: Type de serveur vulnérable
+                guide:
+                  type: string
+                  description: Guide pas à pas pour réaliser l'attaque
+              example:
+                name: "Exploit SQL Injection"
+                description: "Cet exploit permet d'injecter des requêtes SQL malveillantes."
+                authorId: 1
+                serverType: "database"
+                guide: "1. Identifier un point d'injection SQL. 2. Injecter la requête malveillante."
+      responses:
+        '201':
+          description: Exploit créé, renvoie ses données y compris son ID autogénéré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exploit'
+        '400':
+          description: Les données de l'exploit sont manquantes ou incorrectes
+        '401':
+          description: L'utilisateur n'est pas identifié
+
+  /exploits/{exploitId}:
+    parameters:
+      - name: exploitId
+        in: path
+        required: true
+        description: ID de l'exploit
+        schema:
+          type: integer
+          example: 12345
+    get:
+      summary: Consulte les détails d'un exploit
+      description: 
+        Récupère les détails d'un exploit spécifique en utilisant son ID.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '200':
+          description: Renvoie les détails de l'exploit correspond à cet ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exploit'
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucun exploit trouvé pour cet ID
+    put:
+      summary: Modifie un exploit
+      description: 
+        Permet de modifier les détails d'un exploit existant.
+        Il n'est pas possible de modifier l'ID de l'exploit ou l'ID de l'auteur.
+        L'exploit ne peut être validé de cette manière.
+        N'importe quel utilisateur identifié peut modifier un exploit.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      requestBody:
+        required: true
+        description: 
+          Nouvelles donnnées de l'exploit à modifier.
+          L'ID de l'exploit, l'ID de l'auteur et le statut de validation doivent avoir la même valeur que la donnée actuelle.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exploit'
+      responses:
+        '204':
+          description: L'exploit a été modifié
+        '400':
+          description: Les nouvelles données de l'exploit sont manquantes ou incorrectes
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucun exploit n'a été trouvé pour cet ID
+    delete:
+      summary: Supprime un exploit
+      description: 
+        Supprime un exploit spécifique en utilisant son ID.
+        Supprime également les attaques associées à cet exploit.
+        N'importe quel utilisateur identifié peut supprimer un exploit.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '204':
+          description: L'exploit et les attaques correspondant ont été supprimés
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucun exploit n'a été trouvé pour cet ID
+
+  /exploits/{exploitId}/validate:
+    patch:
+      summary: Valide un exploit
+      description: 
+        Valide un exploit spécifique en utilisant son ID.
+        L'exploit ne peut pas avoir déjà été validé.
+        Seul un administrateur peut valider un exploit.
+      security:
+        - BearerAuth:
+          - Administrateur
+      parameters:
+        - name: exploitId
+          in: path
+          required: true
+          description: ID de l'exploit
+          schema:
+            type: integer
+            example: 12345
+      responses:
+        '204':
+          description: L'exploit a bien été validé
+        '400':
+          description: L'exploit était déjà validé
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+        '404':
+          description: Aucun exploit n'a été trouvé pour cet ID
+
+  /attacks:
+    get:
+      summary: Liste toutes les attaques
+      description: 
+        Récupère une liste de toutes les attaques enregistrées dans la plateforme.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '200':
+          description: Renvoie la liste des attaques
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attack'
+        '401':
+          description: L'utilisateur n'est pas identifié
+    post:
+      summary: Crée une nouvelle attaque
+      description:
+        Permet de créer une nouvelle attaque.
+        L'ID de l'attaque sera autogénéré.
+        À sa création, l'attaque aura le statut "planifiée". 
+        Les identifiants des serveurs et exploits associés et les notes ne sont pas encore connus.
+        Vérifie que l'ID de la cible correspondent bien à une cible existante.
+        N'importe quel utilisateur identifié peut créer une nouvelle attaque.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      requestBody:
+        required: true
+        description:
+          Identifiant de la cible à attaquer.
+          L'identifiant de la cible doit correspondre à une cible existante.
+        content:
+          text/plain:
+            schema:
+              type: integer
+              example: 54321
+      responses:
+        '201':
+          description: L'attaque a été créée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Identifiant de l'attaque
+                  targetId:
+                    type: integer
+                    description: Identifiant de la cible de l'attaque
+                example:
+                  id: 98765
+                  targetId: 54321
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '400':
+          description: Les données de l'attaque sont manquantes ou incorrectes
+
+  /attacks/{attackId}:
+    parameters:
+      - name: attackId
+        in: path
+        required: true
+        description: Identifiant de l'attaque
+        schema:
+          type: string
+          example: 98765
+    get:
+      summary: Consulte les détails d'une attaque
+      description: 
+        Récupère les détails d'une attaque spécifique en utilisant son ID.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '200':
+          description: Détails de l'attaque
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attack'
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucune attaque trouvée pour cet ID
+    delete:
+      summary: Supprime une attaque
+      description: 
+        Supprime une attaque spécifique en utilisant son ID.
+        N'importe quel utilisateur identifié peut supprimer une attaque.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      responses:
+        '204':
+          description: L'attaque a été supprimée
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucune attaque trouvée pour cet ID
+
+  /attacks/{attackId}/notes:
+    patch:
+      summary: Modifie les notes de l'attaque
+      description: 
+        Modifie les notes d'une attaque spécifique en utilisant son ID.
+        N'importe quel utilisateur identifié peut modifier les notes d'une attaque.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      parameters:
+        - name: attackId
+          in: path
+          required: true
+          description: Identifiant de l'attaque
+          schema:
+            type: string
+            example: 98765
+      requestBody:
+        required: true
+        description: Nouvelles notes de l'attaque
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: "Nécessite une connexion SSH pour accéder au serveur cible."
+      responses:
+        '204':
+          description: Les notes de l'attaque ont été modifiées
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Aucune attaque trouvée pour cet ID
+
+  /attacks/{attackId}/server:
+    patch:
+      summary: Ajoute un serveur à attaquer
+      description: 
+        Ajoute un serveur à attaquer pour une attaque spécifique. 
+        Vérifie que le serveur existe et est validé.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      parameters:
+        - name: attackId
+          in: path
+          required: true
+          description: Identifiant de l'attaque
+          schema:
+            type: string
+            example: 98765
+      requestBody:
+        required: true
+        description: Identifiant du serveur à attaquer.
+        content:
+          text/plain:
+            schema:
+              type: integer
+              example: 12345
+      responses:
+        '204':
+          description: Serveur ajouté à l'attaque
+        '400':
+          description: Serveur non existant ou validé
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Attaque non trouvé
+
+  /attacks/{attackId}/exploit:
+    patch:
+      summary: Ajoute un exploit à utiliser
+      description:
+        Ajoute un exploit à utiliser pour une attaque spécifique. 
+        Vérifie que l'exploit existe et est validé.
+        N'importe quel utilisateur identifié peut accéder à cette ressource.
+      security:
+        - BearerAuth:
+          - Utilisateur identifié
+      parameters:
+        - name: attackId
+          in: path
+          required: true
+          description: Identifiant de l'attaque
+          schema:
+            type: string
+            example: 98765
+      requestBody:
+        required: true
+        description: Identifiant de l'exploit à utiliser.
+        content:
+          text/plain:
+            schema:
+              type: integer
+              example: 54321
+      responses:
+        '204':
+          description: Exploit ajouté à l'attaque
+        '400':
+          description: Exploit non existant ou validé
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '404':
+          description: Attaque non trouvé
+
+  /attacks/{attackId}/launch:
+    post:
+      summary: Lance l'attaque
+      description: 
+        Lance une attaque spécifique en utilisant son ID.
+        L'attaque doit avoir un serveur et un exploit définis.
+        L'attaque doit être en statut "planifiée".
+        Seul un administrateur peut lancer une attaque.
+      security:
+        - BearerAuth:
+          - Administrateur
+      parameters:
+        - name: attackId
+          in: path
+          required: true
+          description: Identifiant de l'attaque
+          schema:
+            type: string
+            example: 98765
+      responses:
+        '204':
+          description: L'attaque a été lancée
+        '400':
+          description: Serveur ou exploit non défini ou attaque déjà lancée
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+        '404':
+          description: Aucune attaque trouvée pour cet ID
+
+  /attacks/{attackId}/result:
+    post:
+      summary: Enregistre le résultat de l'attaque
+      description: 
+        Enregistre le résultat d'une attaque spécifique en utilisant son ID.
+        L'attaque doit être en statut "en cours".
+        Seul un administrateur peut enregistrer le résultat d'une attaque.
+      security:
+        - BearerAuth:
+          - Administrateur
+      parameters:
+        - name: attackId
+          in: path
+          required: true
+          description: Identifiant de l'attaque
+          schema:
+            type: string
+            example: 98765
+      requestBody:
+        required: true
+        description: Résultat de l'attaque
+        content:
+          text/plain:
+            schema:
+              type: string
+              enum:
+                - terminée
+                - échouée
+              example: échouée
+      responses:
+        '204':
+          description: Résultat de l'attaque enregistré
+        '400':
+          description: L'attaque n'était pas en cours, ou le résultat fourni est incorrect
+        '401':
+          description: L'utilisateur n'est pas identifié
+        '403':
+          description: L'utilisateur n'est pas autorisé à effectuer cette action
+        '404':
+          description: Aucune attaque trouvée pour cet ID
+
+components:
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique de l'utilisateur
+        name:
+          type: string
+          description: Nom de l'utilisateur
+        email:
+          type: string
+          description: Email de l'utilisateur
+        role:
+          type: string
+          description: Rôle de l'utilisateur (admin, utilisateur, etc.)
+          enum:
+            - admin
+            - user
+      example:
+        id: 1
+        name: "John Doe"
+        email: "john.doe@example.com"
+        role: "user"
+
+    Credentials:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email de l'utilisateur
+        password:
+          type: string
+          description: Mot de passe de l'utilisateur
+      example:
+        email: "john.doe@example.com"
+        password: "password123"
+
+    Target:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique de la cible
+        companyName:
+          type: string
+          description: Nom de l'entreprise
+        domain:
+          type: string
+          description: Nom de domaine de l'entreprise
+        location:
+          type: string
+          description: Localisation de l'entreprise
+        employees:
+          type: integer
+          description: Nombre d'employés de l'entreprise
+        servers:
+          type: integer
+          description: Nombre de serveurs de l'entreprise
+        revenue:
+          type: number
+          description: Chiffre d'affaires de l'entreprise
+      example:
+        id: 54321
+        companyName: "CyberCorp"
+        domain: "cybercorp.com"
+        location: "Paris, France"
+        employees: 500
+        servers: 10
+        revenue: 1000000
+    
+    Server:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique du serveur
+        ipAddress:
+          type: string
+          description: Adresse IP du serveur
+        targetId:
+          type: integer
+          description: Identifiant de la cible à qui appartient le serveur
+        serverType:
+          type: string
+          description: Type de serveur
+          enum:
+            - web
+            - database
+            - backup
+            - mail
+            - workstation
+            - ...
+        technology:
+          type: string
+          description: Technologie utilisée par le serveur
+        validated:
+          type: boolean
+          description: Statut de validation du serveur
+      example:
+        id: 67890
+        ipAddress: "192.168.1.1"
+        targetId: 54321
+        serverType: "web"
+        technology: "Apache"
+        validated: false
+
+    Exploit:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique de l'exploit
+        name:
+          type: string
+          description: Nom de l'exploit
+        description:
+          type: string
+          description: Description détaillée de l'exploit
+        authorId:
+          type: integer
+          description: Identifiant de l'utilisateur auteur de l'exploit
+        serverType:
+          type: string
+          description: Type de serveur vulnérable
+        guide:
+          type: string
+          description: Guide pas à pas pour réaliser l'attaque
+        validated:
+          type: boolean
+          description: Statut de validation de l'exploit
+      example:
+        id: 12345
+        name: "Exploit SQL Injection"
+        description: "Cet exploit permet d'injecter des requêtes SQL malveillantes."
+        authorId: 1
+        serverType: "database"
+        guide: "1. Identifier un point d'injection SQL. 2. Injecter la requête malveillante."
+        validated: false
+
+    Attack:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique de l'attaque
+        targetId:
+          type: integer
+          description: Identifiant de la cible de l'attaque
+        serverId:
+          type: integer
+          description: Identifiant du serveur de la cible de l'attaque
+        exploitId:
+          type: integer
+          description: Identifiant de l'exploit utilisé pour l'attaque
+        status:
+          type: string
+          description: Statut de l'attaque
+          enum:
+            - planifiée
+            - en cours
+            - terminée
+            - échouée
+        notes:
+          type: string
+          description: Notes supplémentaires sur l'attaque
+      example:
+        id: 98765
+        targetId: 54321
+        serverId: 67890
+        exploitId: 12345
+        status: "planifiée"
+        notes: "Nécessite une connexion VPN pour accéder au serveur cible."

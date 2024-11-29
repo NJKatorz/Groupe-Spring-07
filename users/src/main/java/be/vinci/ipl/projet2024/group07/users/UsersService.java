@@ -37,6 +37,19 @@ public class UsersService {
     return savedUser;
   }
 
+  // pour les tests d'autentification
+  public User createAdmin(UnsafeCredentials user) {
+    if (repository.existsByEmail(user.getEmail())) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+    }
+    UnsafeCredentials creditential = new UnsafeCredentials();
+    creditential.setEmail(user.getEmail());
+    creditential.setPassword(user.getPassword());
+    User savedUser = repository.save(user.toAdmin());
+    authenticationProxy.register(creditential);
+    return savedUser;
+  }
+
 
   public User readOne(Integer id) {
     return repository.findById(id).orElse(null);
