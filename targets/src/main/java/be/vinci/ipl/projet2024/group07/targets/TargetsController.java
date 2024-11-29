@@ -38,14 +38,14 @@ public class TargetsController {
   /**
    * Récupère toutes les cibles ou celles correspondant au filtre donné.
    * @param minServers le nombre minimum de serveurs (optionnel).
-   * @param maxServers le nombre maximum de serveurs (optionnel).
+   * @param minRevenue le nombre minimum du chiffre d'affaires (optionnel).
    * @return une liste de cibles.
    */
   @GetMapping
   public Iterable<Target> getAllTargets(
       @RequestParam(required = false) Integer minServers,
-      @RequestParam(required = false) Integer maxServers) {
-    return service.getAllTargets(minServers, maxServers);
+      @RequestParam(required = false) Integer minRevenue) {
+    return service.getAllTargets(minServers, minRevenue);
   }
 
   /**
