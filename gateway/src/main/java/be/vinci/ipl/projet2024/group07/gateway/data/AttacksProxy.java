@@ -15,30 +15,73 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "attacks")
 public interface AttacksProxy {
 
-  @GetMapping("/attacks")
+  /**
+   * Get all attacks
+   * @return all attacks
+   */
+  @GetMapping("/attack")
   Iterable<Attack> readAll();
 
-  @PostMapping("/attacks")
+  /**
+   * Create an attack
+   * @param attack the attack to create
+   * @return the created attack
+   */
+  @PostMapping("/attack")
   ResponseEntity<Attack> createOne(@RequestBody Attack attack);
 
-  @GetMapping("/attacks/{attackId}")
+  /**
+   * Get one attack
+   * @param attackId the id of the attack to get
+   * @return the attack
+   */
+  @GetMapping("/attack/{attackId}")
   Attack readOne(@PathVariable int attackId);
 
-  @DeleteMapping("/attacks/{attackId}")
+  /**
+   * Delete one attack
+   * @param attackId the id of the attack to delete
+   */
+  @DeleteMapping("/attack/{attackId}")
   void deleteOne(@PathVariable int attackId);
 
-  @PatchMapping("/attacks/{attackId}/notes")
+  /**
+   * Update the notes of an attack
+   * @param attackId the id of the attack to update
+   * @param notes the new notes
+   */
+  @PatchMapping("/attack/{attackId}/notes")
   void updateNotesAttack(@PathVariable int attackId, @RequestBody String notes);
 
-  @PatchMapping("/attacks/{attackId}/server")
+  /**
+   * Update the id of server of an attack
+   * @param attackId the id of the attack to update
+   * @param serverId the new server id
+   */
+  @PatchMapping("/attack/{attackId}/server")
   void addServerToAttack(@PathVariable int attackId, @RequestBody int serverId);
 
-  @PatchMapping("/attacks/{attackId}/exploit")
+  /**
+   * Update the id of exploit of an attack
+   * @param attackId the id of the attack to update
+   * @param exploitId the new exploit id
+   */
+  @PatchMapping("/attack/{attackId}/exploit")
   void addExploitToAttack(@PathVariable int attackId, @RequestBody int exploitId);
 
-  @PostMapping("/attacks/{attackId}/launch")
+  /**
+   * Launch an attack by its id
+   * @param attackId the id of the attack to update
+   *
+   */
+  @PostMapping("/attack/{attackId}/launch")
   void launchAttack(@PathVariable int attackId);
 
-  @PostMapping("/attacks/{attackId}/result")
+  /**
+   * Record the result of an attack by its id
+   * @param attackId the id of the attack to update
+   *
+   */
+  @PostMapping("/attack/{attackId}/result")
   void recordResult(@PathVariable int attackId, @RequestBody String result);
 }

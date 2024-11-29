@@ -11,7 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor
 public class Server {
   private int id;
-  private String ipAdress;
+  private String ipAddress;
   private int targetId;
   private String serverType;
   private String technology;

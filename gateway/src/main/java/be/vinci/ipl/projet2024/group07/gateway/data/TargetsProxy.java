@@ -15,22 +15,50 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "targets")
 public interface TargetsProxy {
 
+  /**
+   * Get all targets
+   * @param minServers the minimum number of servers to filter
+   * @param minRevenue the minimum revenue to filter
+   * @return all targets
+   */
   @GetMapping("/targets")
-  Iterable<Target> getAllTargets(@RequestParam(required = false) int minServers,
-      @RequestParam(required = false) int minRevenue);
+  Iterable<Target> getAllTargets(@RequestParam(required = false) Integer minServers,
+      @RequestParam(required = false) Integer minRevenue);
 
+  /**
+   * Create a target
+   * @param target
+   */
   @PostMapping("/targets")
   void createOne(@RequestBody Target target);
 
+  /**
+   * Get one target
+   * @param targetId the id of the target to get
+   * @return the target
+   */
   @GetMapping("/targets/{targetId}")
   Target readOne(@PathVariable int targetId);
 
+  /**
+   * Update a target
+   * @param targetId the id of the target to update
+   * @param target the new target
+   */
   @PutMapping("/targets/{targetId}")
   void updateOne(@PathVariable int targetId, @RequestBody Target target);
 
+  /**
+   * Delete one target
+   * @param targetId the id of the target to delete
+   */
   @DeleteMapping("/targets/{targetId}")
   void deleteOne(@PathVariable int targetId);
 
+  /**
+   * Get all colocated targets
+   * @return all colocated targets
+   */
   @GetMapping("/targets/colocated")
   Iterable<String> readColocated();
 }

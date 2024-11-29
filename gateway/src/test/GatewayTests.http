@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:8080
 
-### Create an admin (Tests authentication)
+### Create an admin (Tests authentication) id = 1
 POST {{baseUrl}}/users/admin
 Content-Type: application/json
 
@@ -10,14 +10,35 @@ Content-Type: application/json
   "password": "admin123456"
 }
 
+### Login an existing admin (Tests authentication)
+POST {{baseUrl}}/login
+Content-Type: application/json
 
-### Create a new user
+{
+  "email": "admin@gmail.com",
+  "password": "admin123456"
+}
+
+> {% client.global.set("tokenAdmin", response.body) %}
+
+
+### Create a new user id = 2
 POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
   "name": "John Doit",
   "email": "john.doe@example.com",
+  "password": "user123456"
+}
+
+### Create a new user id = 3
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Marc Evans",
+  "email": "marc.evans@example.com",
   "password": "user123456"
 }
 
@@ -34,17 +55,287 @@ Content-Type: application/json
 
 ### Get user profile
 GET {{baseUrl}}/users/1
-Authorization: {{token2}}
+Authorization: {{token}}
 
-### Login an existing admin
-POST {{baseUrl}}/login
+### Update user's name
+PATCH {{baseUrl}}/users/2/name
 Content-Type: application/json
+Authorization: {{token}}
+
+John Doe
+
+### Get user profile with updated name
+GET {{baseUrl}}/users/2
+Authorization: {{token}}
+
+### Update user's role (error)
+PATCH {{baseUrl}}/users/2/role
+Content-Type: application/json
+Authorization: {{token}}
+
+admin
+
+### Update user's role with admin
+PATCH {{baseUrl}}/users/2/role
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+admin
+
+### Get user profile with updated role
+GET {{baseUrl}}/users/2
+Authorization: {{tokenAdmin}}
+
+### Delete user with admin
+DELETE {{baseUrl}}/users/2
+Authorization: {{tokenAdmin}}
+
+### Update user's password
+PATCH {{baseUrl}}/users/1/password
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
 
 {
   "email": "admin@gmail.com",
-  "password": "admin123456"
+  "password": "admin123456",
+  "newPassword": "password1234"
 }
 
-> {% client.global.set("token2", response.body) %}
+### List of all user's exploits
+GET {{baseUrl}}/users/1/exploits
+Authorization: {{token}}
+
+### Create a target id = 1
+POST {{baseUrl}}/targets
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "companyName": "CyberCorp",
+  "domain": "cybercorp.com",
+  "location": "Paris, France",
+  "employees": 50,
+  "revenue": 1000000
+}
+
+### Create another target id = 2
+POST {{baseUrl}}/targets
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "companyName": "OtherCorp",
+  "domain": "othercorp.com",
+  "location": "Paris, France",
+  "employees": 50,
+  "revenue": 1000000
+}
+
+### Get all targets
+GET {{baseUrl}}/targets
+Authorization: {{tokenAdmin}}
+
+### Get a target
+GET {{baseUrl}}/targets/1
+Authorization: {{tokenAdmin}}
+
+### Update a target
+PUT {{baseUrl}}/targets/1
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "id": 1,
+  "companyName": "CyberCorp",
+  "domain": "cybercorp.com",
+  "location": "Madrid, Espagne",
+  "employees": 50,
+  "revenue": 1000000
+}
+
+### Get a target with updated location
+GET {{baseUrl}}/targets/1
+Authorization: {{tokenAdmin}}
+
+### Delete a target
+DELETE {{baseUrl}}/targets/2
+Authorization: {{tokenAdmin}}
+
+### Get all servers by target
+GET {{baseUrl}}/targets/1/servers
+Authorization: {{tokenAdmin}}
+
+### Get all colocated targets
+GET {{baseUrl}}/targets/colocated
+Authorization: {{tokenAdmin}}
+
+### Create a server id = 1
+POST {{baseUrl}}/servers
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "ipAddress": "192.168.1.10",
+  "targetId": 1,
+  "serverType": "web",
+  "technology": "Apache"
+}
+
+
+### Create another server id = 2
+POST {{baseUrl}}/servers
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "ipAddress": "192.168.156.10",
+  "targetId": 1,
+  "serverType": "database",
+  "technology": "mysql"
+}
+
+### Get one server
+GET {{baseUrl}}/servers/1
+Authorization: {{tokenAdmin}}
+
+### Get one server
+GET {{baseUrl}}/servers/2
+Authorization: {{tokenAdmin}}
+
+### Update a server
+PUT {{baseUrl}}/servers/1
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "id": 1,
+  "ipAddress": "192.168.1.20",
+  "targetId": 1,
+  "serverType": "web",
+  "technology": "Nginx",
+  "validated": false
+}
+
+### Validate a server
+PATCH {{baseUrl}}/servers/1/validate
+Authorization: {{tokenAdmin}}
+
+
+### Create an exploit id = 1
+POST {{baseUrl}}/exploits
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "name" : "SQL Injection",
+  "description": "Cet exploit permet d'injecter des requêtes SQL malveillantes.",
+  "authorId": 1,
+  "serverType": "database",
+  "guide": "1. Identifier un point d'injection SQL. 2. Injecter la requête malveillante."
+}
+
+### Create another exploit id = 2
+POST {{baseUrl}}/exploits
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "name" : "XSS",
+  "description": "Cet exploit permet d'injecter des scripts malveillants dans des pages web.",
+  "authorId": 1,
+  "serverType": "web",
+  "guide": "1. Identifier un point d'injection XSS. 2. Injecter le script malveillant."
+}
+
+### Get all exploits
+GET {{baseUrl}}/exploits
+Authorization: {{tokenAdmin}}
+
+
+### Get an exploit
+GET {{baseUrl}}/exploits/1
+Authorization: {{tokenAdmin}}
+
+### Update an exploit
+PUT {{baseUrl}}/exploits/1
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "name": "Exploit SQL Injection (Mise à jour)",
+  "description": "Cet exploit mis à jour permet d'injecter des requêtes SQL malveillantes avec de nouvelles techniques.",
+  "authorId": 1,
+  "serverType": "database",
+  "guide": "1. Identifier un point d'injection SQL. 2. Utiliser de nouvelles méthodes d'injection."
+}
+
+
+### Validate an exploit
+PATCH {{baseUrl}}/exploits/1/validate
+Authorization: {{tokenAdmin}}
+
+### Delete an exploit
+DELETE {{baseUrl}}/exploits/2
+Authorization: {{tokenAdmin}}
+
+
+### Create an attack
+POST {{baseUrl}}/attacks
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "targetId": 1
+}
+
+### Get all attacks
+GET {{baseUrl}}/attacks
+Authorization: {{tokenAdmin}}
+
+### Get an attack
+GET {{baseUrl}}/attacks/1
+Authorization: {{tokenAdmin}}
+
+### Update notes of an attack
+PATCH {{baseUrl}}/attacks/1/notes
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+Nouvelle note
+
+### Update server of an attack
+PATCH {{baseUrl}}/attacks/1/server
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+1
+
+### Update exploit of an attack
+PATCH {{baseUrl}}/attacks/1/exploit
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+
+1
+
+### Launch an attack
+POST {{baseUrl}}/attacks/1/launch
+Authorization: {{tokenAdmin}}
+
+### Get an launched attack
+GET {{baseUrl}}/attacks/1
+Authorization: {{tokenAdmin}}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

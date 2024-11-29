@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class Attack {
-  private int attackId;
+  private int id;
   private int targetId;
   private int serverId;
   private int exploitId;
