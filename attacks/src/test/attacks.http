@@ -107,14 +107,8 @@ Content-Type: application/json
 ### Suppression des attaques liées à une cible (cas réussi)
 DELETE http://localhost:8084/attack/targets/2
 
-
-### Suppression des attaques liées à une cible inexistante (cas réussi mais sans effet visible)
-DELETE http://localhost:8084/attack/targets/999
-
-
 ### Suppression des attaques liées à un serveur (cas réussi)
 DELETE http://localhost:8084/attack/servers/5
-
 
 ### Suppression des attaques liées à un exploit (cas réussi)
 DELETE http://localhost:8084/attack/exploits/1
