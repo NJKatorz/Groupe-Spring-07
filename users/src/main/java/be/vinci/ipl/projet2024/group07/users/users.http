@@ -1,0 +1,43 @@
+### Création d'un utilisateur
+POST http://localhost:9005/users
+Content-Type: application/json
+
+{
+  "name": "test Doe",
+  "email": "pobbo@example.com",
+  "password": "securepasswordtest"
+}
+
+---
+
+### Lecture d'un utilisateur par ID
+GET http://localhost:9005/users/1
+
+---
+
+### Mise à jour du nom d'un utilisateur
+PATCH http://localhost:9005/users/1/name
+Content-Type: application/json
+
+plpl
+
+
+---
+
+### Mise à jour du rôle d'un utilisateur
+PATCH http://localhost:9005/users/1/role
+Content-Type: application/json
+
+admin
+
+---
+
+### Lecture d'un utilisateur par email
+GET http://localhost:9005/users?email=ff@example.com
+
+---
+
+### Suppression d'un utilisateur par ID
+DELETE http://localhost:9005/users/3
+
+

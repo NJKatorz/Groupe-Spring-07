@@ -1,0 +1,42 @@
+### Test création d'un serveur
+POST http://localhost:8083/servers
+Content-Type: application/json
+
+{
+  "ipAdress": "192.168.1.10",
+  "targetId": 54321,
+  "serverType": "web",
+  "technology": "Apache"
+}
+
+### Test lecture d'un serveur (par ID)
+GET http://localhost:8083/servers/2
+
+### Test modification d'un serveur
+PUT http://localhost:8083/servers/2
+Content-Type: application/json
+
+{
+  "id": 2,
+  "ipAdress": "192.168.1.20",
+  "targetId": 54321,
+  "serverType": "web",
+  "technology": "Nginx",
+  "validated": false
+}
+
+### Test suppression d'un serveur
+DELETE http://localhost:8083/servers/1
+
+### Test lecture du serveur supprimé (par ID)
+GET http://localhost:8083/servers/1
+
+
+### Test validation d'un serveur
+PATCH http://localhost:8083/servers/2/validate
+
+### Test récupération de serveurs associés à une cible
+GET http://localhost:8083/servers/target/54321
+
+### Test suppression de serveurs associés à une cible
+DELETE http://localhost:8083/servers/target/54321

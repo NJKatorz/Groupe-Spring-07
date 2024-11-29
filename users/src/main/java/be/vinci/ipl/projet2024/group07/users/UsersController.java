@@ -20,13 +20,42 @@ public class UsersController {
   }
 
   @PostMapping
-  public ResponseEntity<Void> createOne(@RequestBody UserWithCredentials user) {
+  public ResponseEntity<User> createOne(@RequestBody UnsafeCredentials user) {
     if (user.invalid()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
-    boolean created = service.createOne(user);
+    User createdUser = service.createOne(user);
 
-    if (!created) throw new ResponseStatusException(HttpStatus.CONFLICT);
-    return new ResponseEntity<>(HttpStatus.CREATED);
+    return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+
+  }
+
+  @PatchMapping("/{userId}/name")
+  public ResponseEntity<Void> updateUserName(@PathVariable Integer userId, @RequestBody String newName) {
+    boolean updated = service.updateUserName(userId, newName);
+    if (!updated) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé");
+    }
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  @PatchMapping("/{userId}/role")
+  public ResponseEntity<Void> updateUserRole(@PathVariable Integer userId, @RequestBody String newRole) {
+
+    boolean updated = service.updateUserRole(userId, newRole);
+    if (!updated) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé");
+    }
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+
+  @GetMapping
+  public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
+    User user = service.getByEmail(email);
+    if (user == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé");
+    }
+    return new ResponseEntity<>(user, HttpStatus.OK);
   }
 
   @GetMapping("/{id}")
@@ -37,14 +66,7 @@ public class UsersController {
     return user;
   }
 
-  @PutMapping("/{id}")
-  public void updateOne(@PathVariable Integer id, @RequestBody UserWithCredentials user) {
-    if (!Objects.equals(user.getId(), id)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    if (user.invalid()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
-    boolean updated = service.updateOne(user);
-    if (!updated) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-  }
 
   @DeleteMapping("/{id}")
   public void deleteOne(@PathVariable Integer id) {
